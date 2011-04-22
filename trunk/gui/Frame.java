@@ -15,18 +15,10 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
-import svgedit.gui.actions.DocumentsPropertyAction;
-import svgedit.gui.actions.EditSVGAction;
-import svgedit.gui.actions.InsertCircleAction;
-import svgedit.gui.actions.InsertLineAction;
-import svgedit.gui.actions.InsertRectangleAction;
-import svgedit.gui.actions.NewAction;
-import svgedit.gui.actions.OpenDocumentAction;
-import svgedit.gui.actions.QuitAction;
-import svgedit.gui.actions.SaveAction;
-import svgedit.gui.actions.SaveAsAction;
+
 
 import svgedit.svg.SVGDocument;
 import svgedit.svg.SVGViewport;
@@ -46,68 +38,20 @@ public class Frame extends JFrame {
     private View view;
 
     // Actions available from the menu and toolbar */
-    private Action openAction;
-    private Action quitAction;
-    private Action newAction;
-    private Action saveAction;
-    private Action save_asAction;
-    private Action document_propertiesAction;
-    private Action insert_rectangleAction;
-    private Action insert_circleAction;
-    private Action insert_lineAction;
-    private Action editsvg;
-
-	
     
+    private SelectMenubar smb;
+    private JMenuBar menuBar;
+    private EditBox eb;
+    private DocumentPropertyEditBox dpe;
     /** Creates a frame with a new, empty document. */
     public Frame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         preferences = new Preferences();
-
+        //jp = new JPanel();
         // Create all actions presented by the menu bar and toolbar
-        openAction = new OpenDocumentAction(this);
-        quitAction = new QuitAction(this);
-        //------------------------------------------------
-        newAction = new NewAction(this);
-        saveAction = new SaveAction(this);
-        save_asAction = new SaveAsAction(this);
-        document_propertiesAction = new DocumentsPropertyAction(this);
-        
-        insert_rectangleAction = new InsertRectangleAction(this);
-        insert_circleAction = new InsertCircleAction(this);
-        insert_lineAction = new InsertLineAction(this);
-        
-        editsvg = new EditSVGAction(this);
-        //------------------------------------------------
-        // Associate keyboard shortcuts with actions
-        openAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        newAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        save_asAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK|InputEvent.SHIFT_DOWN_MASK));
-
-        // Create menus
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new MainMenuBar(this);
         add(menuBar, BorderLayout.NORTH);
-        
-        JMenu fileMenu = new JMenu("File");
-        JMenu insertMenu = new JMenu("Insert");
-        JMenu editMenu = new JMenu("Edit");
-        fileMenu.add(new JMenuItem(newAction));
-        fileMenu.add(new JMenuItem(openAction));
-        fileMenu.add(new JMenuItem(saveAction));
-        fileMenu.add(new JMenuItem(save_asAction));
-        fileMenu.add(new JMenuItem(document_propertiesAction));
-        fileMenu.add(new JMenuItem(quitAction));
-        
-        //--------------------------------------------------------------
-        insertMenu.add(new JMenuItem(insert_rectangleAction));
-        insertMenu.add(new JMenuItem(insert_circleAction));
-        insertMenu.add(new JMenuItem(insert_lineAction));
-        editMenu.add(new JMenuItem(editsvg));
-        menuBar.add(fileMenu);
-        menuBar.add(insertMenu);
-        menuBar.add(editMenu);
         // Create view
         view = new View();
         getContentPane().add(view);
@@ -191,5 +135,35 @@ public class Frame extends JFrame {
             JOptionPane.showMessageDialog(getRootPane(), e.getMessage(), "Unable to open file", JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    public void addSelectMenu(){
+        smb =new SelectMenubar(this);
+    	remove(menuBar);
+        add(smb,BorderLayout.NORTH);
+    	smb.revalidate();
+    	System.out.println("UPDATE");
+    	
+    }
+    
+    public void deleteSelectMenu(){
+    	menuBar =new MainMenuBar(this);
+    	remove(smb);
+    	add(menuBar,BorderLayout.NORTH);
+    	menuBar.revalidate();
+    	System.out.println("DELETE");
+    	
+    }
+    
+    public void startEditBox(){
+        eb = new EditBox(this);
+		addSelectMenu();
+    }
+    
+    public void closeEditBox(){
+    	eb.dispose();
+    }
 
+    public void startDocumentPropertyEditBox(){
+    	dpe = new DocumentPropertyEditBox(this); 
+    }  
 }
