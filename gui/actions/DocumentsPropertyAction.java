@@ -18,7 +18,7 @@ public class DocumentsPropertyAction extends AbstractAction{
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
 		System.out.println("DOCUMENT PROPERTIES");
-		DocumentPropertyEditBox dpeb = new DocumentPropertyEditBox(frame);
+		frame.startDocumentPropertyEditBox();
 		
 		
 	}
