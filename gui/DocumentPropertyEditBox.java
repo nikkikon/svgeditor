@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 
 import svgedit.gui.actions.CancelAction;
 import svgedit.gui.actions.ConfirmAction;
+import svgedit.xml.XMLReader;
 
 public class DocumentPropertyEditBox extends JFrame{
              
@@ -16,16 +17,17 @@ public class DocumentPropertyEditBox extends JFrame{
 	private CancelAction cancelAction;
 	private JTextField widthField;
 	private JTextField heigthField;
-	
+	private Frame frame;
 	
 	public DocumentPropertyEditBox(Frame frame){
 		 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-	     setTitle("Document Property Edit Box");
+	     this.frame = frame;
+		 setTitle("Document Property Edit Box");
 		 confirmAction = new ConfirmAction(this);
 		 cancelAction = new CancelAction(this);	 
-		 widthField = new JTextField("DEFAULT");
-		 heigthField = new JTextField("DEFAULT");
-	     
+		 widthField = new JTextField(Float.toString(frame.getDocument().getWidth().getValue()));
+		 heigthField = new JTextField(Float.toString(frame.getDocument().getHeight().getValue()));
+		 
 		 setLayout(new GridLayout(3,2));
 		 
 		 
@@ -39,4 +41,6 @@ public class DocumentPropertyEditBox extends JFrame{
 	     setSize(300,200);
 	     show();
 	}
+	
+	
 }

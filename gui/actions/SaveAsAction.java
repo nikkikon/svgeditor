@@ -1,7 +1,16 @@
 package svgedit.gui.actions;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
 import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 import svgedit.gui.Frame;
+import svgedit.gui.SVGFileFilter;
 
 public class SaveAsAction extends AbstractAction{
 
@@ -13,7 +22,49 @@ public class SaveAsAction extends AbstractAction{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		System.out.println("SAVE AS");
+		String tmpFileName = frame.getTempFile().getName();
+		
+		
+		String directory = frame.getPreferences().getDefaultPath();
+		JFileChooser dialog = new JFileChooser(directory);
+        dialog.addChoosableFileFilter(new SVGFileFilter());
+        dialog.showSaveDialog(null);
+        
+        String savePath = dialog.getCurrentDirectory().getPath()+"\\";
+        String savedFileName = dialog.getSelectedFile().getName()+".svg";
+        
+        
+        	File saveAsFile =  new File(savePath+savedFileName);
+            
+            try {
+    			fileCopy(frame.getTempFile(),saveAsFile);
+    		} catch (Exception e1) {
+    			// TODO Auto-generated catch block
+    			//e1.printStackTrace();
+    		}
+        
+        
+        
+        System.out.println("SAVE AS");
+		
+		
 	}
+	
+	public void fileCopy(File f1,File f2) throws Exception{
+		 int  bytesum  =  0;  
+       int  byteread  =  0;  
+       File  oldfile  =  f1;
+       if  (oldfile.exists())  {  
+           InputStream  inStream  =  new  FileInputStream(f1);  
+           FileOutputStream  fs  =  new  FileOutputStream(f2);  
+           byte[]  buffer  =  new  byte[1444];  
+           int  length;  
+           while  ((byteread  =  inStream.read(buffer))!=  -1)  {  
+               bytesum  +=  byteread;  
+               fs.write(buffer,  0,  byteread);  
+           }  
+           inStream.close();  
+       }   
+	     } 
 
 }
