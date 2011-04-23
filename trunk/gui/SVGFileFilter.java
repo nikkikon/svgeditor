@@ -19,4 +19,6 @@ public class SVGFileFilter extends FileFilter {
     public String getDescription() {
         return "SVG Files";
     }
+    
+    
 }

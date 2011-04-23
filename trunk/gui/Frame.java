@@ -43,6 +43,8 @@ public class Frame extends JFrame {
     private JMenuBar menuBar;
     private EditBox eb;
     private DocumentPropertyEditBox dpe;
+    private File tmpFile;
+    
     /** Creates a frame with a new, empty document. */
     public Frame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -57,7 +59,12 @@ public class Frame extends JFrame {
         getContentPane().add(view);
 
         newFile();
-
+        try {
+			creatTempFile(new File("./null.svg.tmp"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         // Set an initial view size in case the document size is based on the view
         view.setSize(new Dimension(480, 360));
 
@@ -166,4 +173,15 @@ public class Frame extends JFrame {
     public void startDocumentPropertyEditBox(){
     	dpe = new DocumentPropertyEditBox(this); 
     }  
+    
+    public void creatTempFile(File tmpFile) throws IOException{
+    	this.tmpFile = tmpFile;
+    	//tmpFile.createNewFile();
+    }
+    
+    public File getTempFile(){
+    	return tmpFile;
+    }
+    
+    
 }

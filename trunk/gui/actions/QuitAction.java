@@ -1,6 +1,8 @@
 package svgedit.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
+
 import javax.swing.AbstractAction;
 import svgedit.gui.Frame;
 
@@ -18,7 +20,22 @@ public class QuitAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent ae) {
-        System.exit(0);
+    	
+    	deleteTempFiles();
+    	System.exit(0);
+    }
+    
+    public void deleteTempFiles(){
+    	
+    	File dir = new File("./tmpFile/");
+    	File  filelist[]=dir.listFiles(); 
+        
+    	int   listlen=filelist.length; 
+        for(int   i=0;i <listlen;i++)   { 
+          
+                filelist[i].delete(); 
+            }
+    	
     }
 
 }
