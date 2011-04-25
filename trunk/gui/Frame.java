@@ -1,15 +1,18 @@
 package svgedit.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
-
+import java.util.Vector;
+import java.util.Iterator;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -17,6 +20,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+
 
 
 
@@ -45,19 +49,19 @@ public class Frame extends JFrame {
     private DocumentPropertyEditBox dpe;
     private File tmpFile;
     private String filePath;
+    private Vector<JComponent> jc;;
     /** Creates a frame with a new, empty document. */
     public Frame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         filePath = "DEFAULT";
         preferences = new Preferences();
-        //jp = new JPanel();
+        jc = new Vector<JComponent>();
         // Create all actions presented by the menu bar and toolbar
         menuBar = new MainMenuBar(this);
         add(menuBar, BorderLayout.NORTH);
         // Create view
-        view = new View();
+        view = new View(this);
         getContentPane().add(view);
-        
         newFile();
         try {
 			creatTempFile(new File("./null.svg.tmp"));
@@ -135,7 +139,8 @@ public class Frame extends JFrame {
      * @param file the file to load
      */
     public final void openFile(File file) {
-        try {
+    	clearView();
+    	try {
             SVGDocument doc = XMLReader.read(file, view);
             setDocument(doc, file);
         } catch (IOException e) {
@@ -176,7 +181,7 @@ public class Frame extends JFrame {
     
     public void creatTempFile(File tmpFile) throws IOException{
     	this.tmpFile = tmpFile;
-    	//tmpFile.createNewFile();
+    	
     }
     
     public File getTempFile(){
@@ -189,6 +194,19 @@ public class Frame extends JFrame {
     
     public void setfilePath(String path){
     	filePath = path;
+    }
+    public void addJComponent(JComponent c){
+    	jc.add(c);
+    }
+    public void clearView(){
+    	Iterator<JComponent> it = jc.iterator();
+    	while(it.hasNext()){
+    		view.remove(it.next());
+    		System.out.println("REMOVE");
+    		
+    	}
+    	jc.clear();	
+    	
     }
     
 }
