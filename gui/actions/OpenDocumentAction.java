@@ -34,11 +34,14 @@ public class OpenDocumentAction extends AbstractAction {
         File file = dialog.getSelectedFile();
         if (file != null) {
             frame.setfilePath(file.getPath());
+            frame.getPreferences().setDefaultPath(file.getPath());
             tmpFile = new File("./tmpFile/"+file.getName()+".tmp");
             try {
 				fileCopy(file,tmpFile);
 				frame.creatTempFile(tmpFile);  
-				frame.openFile(tmpFile);
+				
+				frame.openFile(file);
+				
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

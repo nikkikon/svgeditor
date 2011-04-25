@@ -21,11 +21,14 @@ public class View extends JComponent implements SVGViewport {
 
     private SVGDocument document;
     private ElementView elementView;
+    private Frame frame;
     //private int paintTimes;
     /** Creates a new view */
-    public View() {
-    	//paintTimes = 0;
-    	//System.out.println("VIEW");
+   // public View() {
+    	
+    //}
+    public View(Frame frame) {
+    	this.frame = frame;
     }
 
     public float getViewportWidth() {
@@ -73,6 +76,8 @@ public class View extends JComponent implements SVGViewport {
         		elementView = new ElementView(elem);
             	//elementView.paintElement(g, elem);
             	add(elementView);
+            	frame.addJComponent(elementView);
+            	System.out.println("ADD COMPONENT");
             	elem.setPaint();
         	}
     		 
