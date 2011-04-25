@@ -14,7 +14,7 @@ public class Preferences {
 
     /** Key for the default path to use for file dialogs */
     public static final String KEY_DEFAULT_PATH = "defaultPath";
-
+     
     /** Creates a new preferences object.  Only one object is required, as
      *  all preferences are stored per-user.
      */

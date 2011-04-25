@@ -13,9 +13,10 @@ public class SVGRectElement extends SVGStylableElement {
     private SVGLength y;
     private SVGLength width;
     private SVGLength height;
-
+    private boolean isPaint;
     public SVGRectElement(SVGDocument document) {
         super(document);
+        isPaint = false;
         x = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
         y = new SVGLength(document, SVGLength.SVG_DIMENSION_Y);
         width = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
@@ -92,8 +93,35 @@ public class SVGRectElement extends SVGStylableElement {
         return Math.abs(height.getValue());
     }
 
-    public Shape createShape() {
+    public Shape createShape2() {
         return new Rectangle2D.Float(getAbsLeft(), getAbsTop(), getAbsWidth(), getAbsHeight());
     }
+
+    public Shape createShape() {
+        return new Rectangle2D.Float(getStrokeWidth().getValue()/2+8,getStrokeWidth().getValue()/2+8,getAbsWidth(), getAbsHeight());
+    }
+	@Override
+	public String getShape() {
+		// TODO Auto-generated method stub
+		return "Rectangle";
+	}
+
+	@Override
+	public float[] getDemision() {
+		// TODO Auto-generated method stub
+		float[] d = {x.getValue(),y.getValue(),width.getValue(),height.getValue()};
+		return d;
+	}
+	
+	public boolean isPaint() {
+		// TODO Auto-generated method stub
+		return isPaint;
+	}
+
+	@Override
+	public void setPaint() {
+		// TODO Auto-generated method stub
+		isPaint = true;
+	}
 
 }

@@ -13,10 +13,10 @@ public class SVGLineElement extends SVGStylableElement {
     private SVGLength y1;
     private SVGLength x2;
     private SVGLength y2;
-
+    private boolean isPaint;
     public SVGLineElement(SVGDocument document) {
         super(document);
-
+        isPaint = false;
         x1 = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
         y1 = new SVGLength(document, SVGLength.SVG_DIMENSION_Y);
         x2 = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
@@ -66,7 +66,40 @@ public class SVGLineElement extends SVGStylableElement {
 
     @Override
     public Shape createShape() {
-        return new Line2D.Float(x1.getValue(), y1.getValue(), x2.getValue(), y2.getValue());
+       // return new Line2D.Float(x1.getValue(), y1.getValue(), x2.getValue(), y2.getValue());
+    	return new Line2D.Float(getStrokeWidth().getValue(), getStrokeWidth().getValue(), Math.abs(x2.getValue()-x1.getValue()), Math.abs(y2.getValue()-y1.getValue()));
     }
+
+	@Override
+	public String getShape() {
+		// TODO Auto-generated method stub
+		return "Line";
+	}
+
+	@Override
+	public float[] getDemision() {
+		// TODO Auto-generated method stub
+;
+		if(x1.getValue()<x2.getValue()){
+			float[] d = {x1.getValue(),y1.getValue(),Math.abs(x2.getValue()-x1.getValue()),Math.abs(y2.getValue()-y1.getValue())};
+		    return d;
+		}
+		else{
+			float[] d = {x2.getValue(),y2.getValue(),Math.abs(x2.getValue()-x1.getValue()),Math.abs(y2.getValue()-y1.getValue())};
+		    return d;
+		}
+		
+	}
+	
+	public boolean isPaint() {
+		// TODO Auto-generated method stub
+		return isPaint;
+	}
+
+	@Override
+	public void setPaint() {
+		// TODO Auto-generated method stub
+		isPaint = true;
+	}
 
 }

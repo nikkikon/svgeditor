@@ -63,5 +63,12 @@ public abstract class SVGElement {
 
     /** Calls the appropriate visit method on the given visitor. */
     public abstract void acceptVisitor(SVGVisitor visitor);
+    
+    public abstract String getShape();
+    
+    public abstract float[] getDemision();
+    public abstract SVGLength getStrokeWidth();
+    public abstract boolean isPaint();
+    public abstract void setPaint();
 
 }
