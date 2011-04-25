@@ -23,13 +23,14 @@ public class SaveAction extends AbstractAction{
 		// TODO Auto-generated method stub
 		String tmpFileName = frame.getTempFile().getName();
 		String savedFileName = tmpFileName.substring(0,tmpFileName.indexOf(".tmp"));
-		if(!frame.getPreferences().getDefaultPath().equals("defaultPath")){
-			
-			savedFile= new File(frame.getPreferences().getDefaultPath());
+		System.out.println(frame.getfilePath());
+		if(!frame.getfilePath().equals("DEFAULT")){
+			savedFile= new File(frame.getfilePath());
+			System.out.println(savedFile.getPath());
 		}
 		else{
 			savedFile= new File("./savedFile/"+savedFileName);
-			
+			System.out.println(savedFile.getPath());
 		}
 		
 		try {

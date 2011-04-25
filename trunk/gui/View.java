@@ -20,9 +20,12 @@ import svgedit.svg.SVGViewport;
 public class View extends JComponent implements SVGViewport {
 
     private SVGDocument document;
-
+    private ElementView elementView;
+    //private int paintTimes;
     /** Creates a new view */
     public View() {
+    	//paintTimes = 0;
+    	//System.out.println("VIEW");
     }
 
     public float getViewportWidth() {
@@ -40,6 +43,7 @@ public class View extends JComponent implements SVGViewport {
      */
     @Override
     protected void paintComponent(Graphics g) {
+    	
         paint2D((Graphics2D) g);
     }
 
@@ -59,10 +63,27 @@ public class View extends JComponent implements SVGViewport {
         g.fillRect(0, 0, documentWidth, documentHeight);
         g.setColor(Color.BLACK);
         g.drawRect(-1, -1, documentWidth, documentHeight);
-
+       // 
+       // add(elementView);
+        
         // Paint document
         for (SVGElement elem : document) {
-            paintElement(g, elem);
+        	
+        	if(!elem.isPaint()){
+        		elementView = new ElementView(elem);
+            	//elementView.paintElement(g, elem);
+            	add(elementView);
+            	elem.setPaint();
+        	}
+    		 
+        		
+        	
+        	//paintTimes++;
+        	//System.out.println(elem.getShape());
+        	//elementView = new ElementView(elem);
+        	//elementView.paintElement(g, elem);
+        	//add(elementView);
+        	//System.out.println(paintTimes);
         }
     }
 
@@ -71,9 +92,10 @@ public class View extends JComponent implements SVGViewport {
      * @param g the graphics context to paint to
      * @param elem the element to paint
      */
-    public void paintElement(Graphics2D g, SVGElement elem) {
+    /*public void paintElement(Graphics2D g, SVGElement elem) {
 
-        if (!(elem instanceof SVGStylable))
+        
+    	if (!(elem instanceof SVGStylable))
             return;
 
         Shape shape = elem.createShape();
@@ -96,7 +118,9 @@ public class View extends JComponent implements SVGViewport {
             g.setColor(strokePaint.getRGBColor());
             g.draw(shape);
         }
+        
     }
+    **/
 
     /** Gets the document currently being displayed by the view. */
     public SVGDocument getDocument() {

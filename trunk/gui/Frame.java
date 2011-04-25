@@ -44,11 +44,11 @@ public class Frame extends JFrame {
     private EditBox eb;
     private DocumentPropertyEditBox dpe;
     private File tmpFile;
-    
+    private String filePath;
     /** Creates a frame with a new, empty document. */
     public Frame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+        filePath = "DEFAULT";
         preferences = new Preferences();
         //jp = new JPanel();
         // Create all actions presented by the menu bar and toolbar
@@ -57,7 +57,7 @@ public class Frame extends JFrame {
         // Create view
         view = new View();
         getContentPane().add(view);
-
+        
         newFile();
         try {
 			creatTempFile(new File("./null.svg.tmp"));
@@ -183,5 +183,12 @@ public class Frame extends JFrame {
     	return tmpFile;
     }
     
+    public String getfilePath(){
+    	return filePath;
+    }
+    
+    public void setfilePath(String path){
+    	filePath = path;
+    }
     
 }
