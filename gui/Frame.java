@@ -22,11 +22,14 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 
 
 import svgedit.svg.SVGDocument;
+import svgedit.svg.SVGRootElement;
 import svgedit.svg.SVGViewport;
 import svgedit.xml.*;
 
@@ -51,7 +54,8 @@ public class Frame extends JFrame {
     private DocumentPropertyEditBox dpe;
     private File tmpFile;
     private String filePath;
-    private Vector<JComponent> jc;;
+    private Vector<JComponent> jc;
+    private SVGRootElement svgRootElement;
     /** Creates a frame with a new, empty document. */
     public Frame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -212,9 +216,13 @@ public class Frame extends JFrame {
     }
     
 	public void writeFile() throws IOException{
-    	
     	Document doc = XMLReader.getDocument();
 	    XMLUtil.write(doc,tmpFile);
+	    
     }
+
+
+
+	
     
 }

@@ -64,10 +64,10 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 			      startPos = me.getPoint();
 			      c.requestFocus();
 			      c.repaint();
-			      System.out.println("ELEMENT BEFORE"+c.getElement().getAttribute("x"));
-			      c.getElement().setAttribute("x", "666");
-			      System.out.println("ELEMENT AFTER"+c.getElement().getAttribute("x"));
-			      
+			      //System.out.println("ELEMENT BEFORE"+c.getElement().getAttribute("x"));
+			      //c.getElement().setAttribute("x", "666");
+			      //System.out.println("ELEMENT AFTER"+c.getElement().getAttribute("x"));
+			      c.getView().repaint();
 			    }
 
 			    public void mouseDragged(MouseEvent me) {

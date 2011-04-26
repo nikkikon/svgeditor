@@ -25,6 +25,7 @@ public class SaveAction extends AbstractAction{
 		String savedFileName = tmpFileName.substring(0,tmpFileName.indexOf(".tmp"));
 		System.out.println(frame.getfilePath());
 		if(!frame.getfilePath().equals("DEFAULT")){
+			
 			savedFile= new File(frame.getfilePath());
 			System.out.println(savedFile.getPath());
 		}
@@ -40,7 +41,7 @@ public class SaveAction extends AbstractAction{
 			e1.printStackTrace();
 		}
 		
-		System.out.println(savedFileName);
+		System.out.println(savedFile.getPath());
 		System.out.println("SAVE FILE");
 		
 	}

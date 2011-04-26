@@ -60,7 +60,8 @@ public class ResizeMouseListenerLine extends ResizeMouseListener implements Mous
 			      startPos = me.getPoint();
 			      c.requestFocus();
 			      c.repaint();
-			      System.out.println(c.getElement());
+			      c.getView().repaint();
+			      
 			    }
 
 			    public void mouseDragged(MouseEvent me) {

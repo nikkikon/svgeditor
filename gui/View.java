@@ -38,7 +38,9 @@ public class View extends JComponent implements SVGViewport {
     public float getViewportHeight() {
         return getHeight();
     }
-
+    public Frame getFrame(){
+    	return frame;
+    }
     /** Internal paint entry point.  All drawing in the view uses a {@link Graphics2D},
      *  so for convenience this method simply delegates to {@link #paint2D}.
      *
@@ -67,28 +69,20 @@ public class View extends JComponent implements SVGViewport {
         g.setColor(Color.BLACK);
         g.drawRect(-1, -1, documentWidth, documentHeight);
        // 
-       // add(elementView);
-        
+      
         // Paint document
         for (SVGElement elem : document) {
         	
         	if(!elem.isPaint()){
-        		elementView = new ElementView(elem);
+        		elementView = new ElementView(elem,this);
             	//elementView.paintElement(g, elem);
             	add(elementView);
             	frame.addJComponent(elementView);
-            	System.out.println("ADD COMPONENT");
+            	
             	elem.setPaint();
         	}
-    		 
-        		
         	
-        	//paintTimes++;
-        	//System.out.println(elem.getShape());
-        	//elementView = new ElementView(elem);
-        	//elementView.paintElement(g, elem);
-        	//add(elementView);
-        	//System.out.println(paintTimes);
+    	
         }
     }
 
