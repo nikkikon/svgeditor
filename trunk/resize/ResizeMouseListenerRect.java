@@ -10,16 +10,20 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
+import svgedit.gui.ElementView;
+import svgedit.svg.SVGElement;
+import svgedit.xml.XMLUtil;
+
 
 
 public class ResizeMouseListenerRect extends ResizeMouseListener implements MouseListenerInterface{
 
 	
-	private JComponent c;
+	private ElementView c;
 	private MouseInputListener resizeListener;
 	
 	
-	public ResizeMouseListenerRect(JComponent c,ResizeableBorder border){
+	public ResizeMouseListenerRect(ElementView c,ResizeableBorder border){
 		this.c = c;
 		addResizeMouseListener();
 		
@@ -43,6 +47,7 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 			    	 // System.out.println(me.getComponent().getGraphics().getClass());
 			    	  ResizeableBorderRectangle border = (ResizeableBorderRectangle)(c.getBorder());
 			          c.setCursor(Cursor.getPredefinedCursor(border.getCursor(me)));
+			          
 			      }
 			    }
 
@@ -59,6 +64,10 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 			      startPos = me.getPoint();
 			      c.requestFocus();
 			      c.repaint();
+			      System.out.println("ELEMENT BEFORE"+c.getElement().getAttribute("x"));
+			      c.getElement().setAttribute("x", "666");
+			      System.out.println("ELEMENT AFTER"+c.getElement().getAttribute("x"));
+			      
 			    }
 
 			    public void mouseDragged(MouseEvent me) {
@@ -151,6 +160,12 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 			     startPos = null;
 			    }
 			  };
+	}
+
+	@Override
+	public SVGElement getSVGElement() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	

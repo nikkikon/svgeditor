@@ -4,6 +4,8 @@ import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.w3c.dom.Element;
+
 /** Represents a {@literal 'g'} element in the document.
  * 
  * We do not currently support style inheritance, so there is no need to
@@ -14,6 +16,13 @@ public class SVGGroup extends SVGElement implements Iterable<SVGElement> {
 
     private ArrayList<SVGElement> children;
     private boolean isPaint;
+    private Element elem;
+    public SVGGroup(SVGDocument document,Element elem) {
+        super(document);
+        this.elem = elem;
+        children = new ArrayList<SVGElement>();
+        isPaint=false;
+    }
     public SVGGroup(SVGDocument document) {
         super(document);
         children = new ArrayList<SVGElement>();
@@ -89,6 +98,12 @@ public class SVGGroup extends SVGElement implements Iterable<SVGElement> {
 	public void setPaint() {
 		// TODO Auto-generated method stub
 		isPaint = true;
+	}
+
+	@Override
+	public Element getElement() {
+		// TODO Auto-generated method stub
+		return elem;
 	}
 
 }

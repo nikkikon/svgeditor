@@ -2,6 +2,8 @@ package svgedit.svg;
 
 import java.awt.Shape;
 
+import org.w3c.dom.Element;
+
 /** An SVG visual element.
  *
  * The interfaces defined here roughly correspond to the SVG DOM interfaces
@@ -70,5 +72,5 @@ public abstract class SVGElement {
     public abstract SVGLength getStrokeWidth();
     public abstract boolean isPaint();
     public abstract void setPaint();
-
+    public abstract Element getElement();
 }

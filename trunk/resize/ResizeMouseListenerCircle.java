@@ -9,17 +9,20 @@ import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
+import svgedit.gui.ElementView;
+import svgedit.svg.SVGElement;
+
 
 
 
 
 public class ResizeMouseListenerCircle extends ResizeMouseListener implements MouseListenerInterface{
 
-	private JComponent c;
+	private ElementView c;
 	private MouseInputListener resizeListener;
 	
 	
-	public ResizeMouseListenerCircle(JComponent c,ResizeableBorder border){
+	public ResizeMouseListenerCircle(ElementView c,ResizeableBorder border){
 		this.c = c;
 		addResizeMouseListener();
 		
@@ -33,6 +36,7 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 	public void resize() {
 	    if (c.getParent()!= null) {
 	      ((JComponent)(c.getParent())).revalidate();
+	      
 	    }
 	}
 	
@@ -46,6 +50,7 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			    	 
 			    	  ResizeableBorderCircle border = (ResizeableBorderCircle)(c.getBorder());
 			          c.setCursor(Cursor.getPredefinedCursor(border.getCursor(me)));
+			          
 			      }
 			    }
 
@@ -63,6 +68,7 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			      startPos = me.getPoint();
 			      c.requestFocus();
 			      c.repaint();
+			      
 			      
 			    }
 
@@ -156,6 +162,12 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			     startPos = null;
 			    }
 			  };
+	}
+
+	@Override
+	public SVGElement getSVGElement() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

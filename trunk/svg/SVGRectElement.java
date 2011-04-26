@@ -3,6 +3,8 @@ package svgedit.svg;
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
+import org.w3c.dom.Element;
+
 /** Element describing a rectangle.
  *
  * Implements {@literal 9.8.1 Interface SVGRectElement}.
@@ -14,8 +16,11 @@ public class SVGRectElement extends SVGStylableElement {
     private SVGLength width;
     private SVGLength height;
     private boolean isPaint;
-    public SVGRectElement(SVGDocument document) {
+    private Element elem;
+    public SVGRectElement(SVGDocument document,Element elem) {
         super(document);
+        this.elem = elem;
+       
         isPaint = false;
         x = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
         y = new SVGLength(document, SVGLength.SVG_DIMENSION_Y);
@@ -51,7 +56,9 @@ public class SVGRectElement extends SVGStylableElement {
     public SVGLength getWidth() {
         return width;
     }
-
+    public void setWidth(){
+    	//change length;
+    }
     /**
      * Gets the height of the rectangle. This may be negative.
      * 
@@ -122,6 +129,12 @@ public class SVGRectElement extends SVGStylableElement {
 	public void setPaint() {
 		// TODO Auto-generated method stub
 		isPaint = true;
+	}
+
+	@Override
+	public Element getElement() {
+		// TODO Auto-generated method stub
+		return elem;
 	}
 
 }

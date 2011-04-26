@@ -3,6 +3,8 @@ package svgedit.svg;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 
+import org.w3c.dom.Element;
+
 /** Element describing a circle.
  * 
  * Specified in 9.8.2 Interface SVGCircleElement
@@ -13,9 +15,11 @@ public class SVGCircleElement extends SVGStylableElement {
     private SVGLength cx;
     private SVGLength cy;
     private boolean isPaint;
-    public SVGCircleElement(SVGDocument document) {
+    private Element elem;
+    public SVGCircleElement(SVGDocument document,Element elem) {
         super(document);
         isPaint = false;
+        this.elem = elem;
         r = new SVGLength(document, SVGLength.SVG_DIMENSION_OTHER);
         cx = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
         cy = new SVGLength(document, SVGLength.SVG_DIMENSION_Y);
@@ -29,7 +33,7 @@ public class SVGCircleElement extends SVGStylableElement {
     public SVGLength getR() {
         return r;
     }
-
+    
     /**
      * Gets the center X coordinate
      * 
@@ -67,7 +71,7 @@ public class SVGCircleElement extends SVGStylableElement {
 		// TODO Auto-generated method stub
 		return "Circle";
 	}
-
+    
 	@Override
 	public float[] getDemision() {
 		// TODO Auto-generated method stub
@@ -85,6 +89,12 @@ public class SVGCircleElement extends SVGStylableElement {
 	public void setPaint() {
 		// TODO Auto-generated method stub
 		isPaint = true;
+	}
+
+	@Override
+	public Element getElement() {
+		// TODO Auto-generated method stub
+		return elem;
 	}
 
 }
