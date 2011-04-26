@@ -3,6 +3,8 @@ package svgedit.svg;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 
+import org.w3c.dom.Element;
+
 /** Element describing a line segment.
  *
  * Implements {@literal 9.8.4 Interface SVGLineElement}.
@@ -14,9 +16,11 @@ public class SVGLineElement extends SVGStylableElement {
     private SVGLength x2;
     private SVGLength y2;
     private boolean isPaint;
-    public SVGLineElement(SVGDocument document) {
+    private Element elem;
+    public SVGLineElement(SVGDocument document,Element elem) {
         super(document);
         isPaint = false;
+        this.elem = elem;
         x1 = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
         y1 = new SVGLength(document, SVGLength.SVG_DIMENSION_Y);
         x2 = new SVGLength(document, SVGLength.SVG_DIMENSION_X);
@@ -31,7 +35,7 @@ public class SVGLineElement extends SVGStylableElement {
     public SVGLength getX1() {
         return x1;
     }
-
+    
     /**
      * Gets the first Y coordinate
      * 
@@ -100,6 +104,12 @@ public class SVGLineElement extends SVGStylableElement {
 	public void setPaint() {
 		// TODO Auto-generated method stub
 		isPaint = true;
+	}
+
+	@Override
+	public Element getElement() {
+		// TODO Auto-generated method stub
+		return elem;
 	}
 
 }

@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
+import org.w3c.dom.Element;
+
 
 import svgedit.resize.ResizeMouseListener;
 import svgedit.resize.ResizeMouseListenerCircle;
@@ -36,7 +38,7 @@ public class ElementView extends JComponent{
         addMouseListener(resizeListener);
 	    addMouseMotionListener(resizeListener);
 	    setBorder(rb);
-	    //System.out.println(resizeListener);
+	    System.out.println(elem);
 	   
 	    	x = (int) elem.getDemision()[0];
 	    	y = (int) elem.getDemision()[1];
@@ -52,7 +54,7 @@ public class ElementView extends JComponent{
 	    	}
 	    	
 	}
-public void paint(Graphics g){
+   public void paint(Graphics g){
 		super.paint(g);
 		//System.out.println("PAINT");
 
@@ -83,7 +85,14 @@ public void paint(Graphics g){
         
        
 	}
+   
+   public SVGElement getSVGElement(){
+	   return elem;
+   }
 	
+   public Element getElement(){
+	   return elem.getElement();
+   }
 	/*public void paintElement(Graphics2D g, SVGElement elem) {
 
 		

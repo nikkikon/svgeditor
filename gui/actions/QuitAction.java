@@ -2,6 +2,7 @@ package svgedit.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.AbstractAction;
 import svgedit.gui.Frame;

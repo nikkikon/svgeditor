@@ -2,6 +2,7 @@ package svgedit.svg;
 
 import java.io.File;
 
+
 /** Top-level document object describing an SVG document.
  *
  * The contents of the document are contained within the "root group" -- a
@@ -15,7 +16,6 @@ public class SVGDocument implements SVGViewport, Iterable<SVGElement> {
 
     private SVGLength width;
     private SVGLength height;
-
     private SVGGroup root;
 
     /** Creates a new SVG document situated within a viewport. */

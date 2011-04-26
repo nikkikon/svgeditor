@@ -15,7 +15,7 @@ public class XMLReader {
     private static final Logger logger = Logger.getLogger("svgedit");
 
     private boolean fail;
-
+    private static Document doc; 
     private SVGDocument document;
 
     /** Creates an {@link svgedit.svg.SVGDocument} from a file.  Any errors
@@ -30,7 +30,7 @@ public class XMLReader {
 	try {
 	    XMLReader reader = new XMLReader(viewport);
 
-	    Document doc = XMLUtil.read(file);
+	    doc = XMLUtil.read(file);
 	    Element elem = doc.getDocumentElement();
 	    reader.readSVGElement(elem);
 
@@ -56,7 +56,7 @@ public class XMLReader {
     private void readSVGElement(Element elem) throws SAXException {
         if (!elem.getNodeName().equals("svg"))
             throw new SAXException("SVG document must have 'svg' document element");
-
+     
 	// Read document properties
 	readLengthAttribute(elem, "width", document.getWidth());
 	readLengthAttribute(elem, "height", document.getHeight());
@@ -90,7 +90,7 @@ public class XMLReader {
      * @return a new SVG element
      */
     private SVGElement readRectElement(Element elem) {
-	SVGRectElement rect = new SVGRectElement(document);
+	SVGRectElement rect = new SVGRectElement(document,elem);
 	readLengthAttribute(elem, "x", rect.getX());
 	readLengthAttribute(elem, "y", rect.getY());
 	readLengthAttribute(elem, "width", rect.getWidth());
@@ -107,7 +107,7 @@ public class XMLReader {
      * @return a new SVG element
      */
     private SVGElement readCircleElement(Element elem) {
-	SVGCircleElement circle = new SVGCircleElement(document);
+	SVGCircleElement circle = new SVGCircleElement(document,elem);
 	readLengthAttribute(elem, "cx", circle.getCX());
 	readLengthAttribute(elem, "cy", circle.getCY());
 	readLengthAttribute(elem, "r", circle.getR());
@@ -124,7 +124,7 @@ public class XMLReader {
      * @return a new SVG element
      */
     private SVGElement readLineElement(Element elem) {
-	SVGLineElement line = new SVGLineElement(document);
+	SVGLineElement line = new SVGLineElement(document,elem);
 	readLengthAttribute(elem, "x1", line.getX1());
 	readLengthAttribute(elem, "y1", line.getY1());
 	readLengthAttribute(elem, "x2", line.getX2());
@@ -221,5 +221,7 @@ public class XMLReader {
 	}
     }
     
-    
+    public static Document getDocument(){
+    	return doc;
+    }
 }

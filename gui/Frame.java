@@ -21,6 +21,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import org.w3c.dom.Document;
+
 
 
 
@@ -207,6 +209,12 @@ public class Frame extends JFrame {
     	}
     	jc.clear();	
     	
+    }
+    
+	public void writeFile() throws IOException{
+    	
+    	Document doc = XMLReader.getDocument();
+	    XMLUtil.write(doc,tmpFile);
     }
     
 }

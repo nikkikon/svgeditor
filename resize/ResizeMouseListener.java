@@ -5,12 +5,14 @@ import java.awt.Component;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
+import svgedit.gui.ElementView;
+
 public class ResizeMouseListener {
 	
 	private String shape;
-	private JComponent c;
+	private ElementView c;
 	private ResizeableBorder rb;
-	public ResizeMouseListener(JComponent c,String shape){
+	public ResizeMouseListener(ElementView c,String shape){
 		this.c = c;
 		this.shape = shape;
 	};

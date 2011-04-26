@@ -10,6 +10,8 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+
+
 /** Utility class to simplify reading and writing XML DOM */
 public class XMLUtil {
 
@@ -74,8 +76,7 @@ public class XMLUtil {
 	try {
 	    DOMSource domSource = new DOMSource(doc);
 	    FileOutputStream stream = new FileOutputStream(file);
-
-	    // OutputStreamWriter works around indent bug 6296446 in JDK
+   	    // OutputStreamWriter works around indent bug 6296446 in JDK
 	    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6296446
 	    StreamResult streamResult = new StreamResult(new OutputStreamWriter(stream));
 	    TransformerFactory tf = TransformerFactory.newInstance();

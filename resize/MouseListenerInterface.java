@@ -2,9 +2,12 @@ package svgedit.resize;
 
 import javax.swing.event.MouseInputListener;
 
+import svgedit.svg.SVGElement;
+
  public interface MouseListenerInterface {
-	abstract public void addResizeMouseListener();
-	abstract public void resize();
-	abstract public MouseInputListener getListener();
+	public void addResizeMouseListener();
+	public void resize();
+	public MouseInputListener getListener();
+	public SVGElement getSVGElement();
 
 }
