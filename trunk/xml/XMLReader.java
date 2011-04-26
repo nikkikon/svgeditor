@@ -18,6 +18,7 @@ public class XMLReader {
     private static Document doc; 
     private SVGDocument document;
 
+    private static SVGRootElement svgRootElement;
     /** Creates an {@link svgedit.svg.SVGDocument} from a file.  Any errors
      * in the file are logged, and will throw an {@link IOException}.
      *
@@ -56,7 +57,7 @@ public class XMLReader {
     private void readSVGElement(Element elem) throws SAXException {
         if (!elem.getNodeName().equals("svg"))
             throw new SAXException("SVG document must have 'svg' document element");
-     
+    creatSVGRootElement(elem);
 	// Read document properties
 	readLengthAttribute(elem, "width", document.getWidth());
 	readLengthAttribute(elem, "height", document.getHeight());
@@ -64,7 +65,12 @@ public class XMLReader {
 	readGroupChildrenElements(elem, document.getRootGroup());
     }
 
-    /** Reads an XML element from an SVG document.  Returns the corresponding
+    private void creatSVGRootElement(Element elem) {
+		// TODO Auto-generated method stub
+    	svgRootElement = new SVGRootElement(elem);
+	}
+
+	/** Reads an XML element from an SVG document.  Returns the corresponding
      * SVG element fully parsed
      *
      * @param elem the XML element to parse
@@ -223,5 +229,8 @@ public class XMLReader {
     
     public static Document getDocument(){
     	return doc;
+    }
+    public static SVGRootElement getsvgRootElement(){
+    	return svgRootElement;
     }
 }

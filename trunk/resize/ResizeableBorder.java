@@ -50,6 +50,7 @@ public class ResizeableBorder implements Border{
 		
 		for(int i = 0;i< locations.length; i++){
 			Rectangle rect  = getRectangle(0,0,w,h,locations[i]);
+			
 			if(rect.contains(me.getPoint())){
 				return cursors[i];
 			}
@@ -62,17 +63,15 @@ public class ResizeableBorder implements Border{
 		// TODO Auto-generated method stub
 		//g.setColor(Color.WHITE);
 		//g.drawRect(x + dist, y + dist, w, h);
-		
 		if(c.hasFocus()){
 			for(int i =0; i<locations.length;i++){
 				Rectangle rect = getRectangle(x, y, w, h, locations[i]);
 				g.setColor(Color.WHITE);
 				g.fillRect(rect.x, rect.y, rect.width - 1, rect.height - 1);
-		        g.setColor(Color.black);
+		        g.setColor(Color.BLACK);
 		        g.drawRect(rect.x, rect.y, rect.width - 1, rect.height - 1);
 			}
-			
-		}
+			}
 	}
 	
 
@@ -90,10 +89,5 @@ public class ResizeableBorder implements Border{
 		return false;
 	}
 
-	
-    public void print(){
-    	System.out.println(locations.length);
-    	System.out.println(cursors.length);
-    }
-	
+
 }

@@ -41,6 +41,13 @@ public class DocumentPropertyEditBox extends JFrame{
 	     setSize(300,200);
 	     show();
 	}
-	
-	
+	public String getNewWidth(){
+		return widthField.getText();
+	}
+	public String getNewHeigth(){
+		return heigthField.getText();
+	}
+	public Frame getFrame(){
+		return frame;
+	}
 }

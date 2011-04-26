@@ -36,7 +36,7 @@ public class SVGLength {
     private int unitType;
     private int dimensionType;
     private float valueInSpecifiedUnits;
-
+    
     /**
      * Constructs a new length with unspecified value and unit, not situated in
      * a viewport.
@@ -73,7 +73,7 @@ public class SVGLength {
      * @param dimensionType
      *            dimension along which to measure this length
      */
-    SVGLength(SVGViewport viewport, int dimensionType) {
+    public SVGLength(SVGViewport viewport, int dimensionType) {
         assert (dimensionType == SVG_DIMENSION_X || dimensionType == SVG_DIMENSION_Y || dimensionType == SVG_DIMENSION_OTHER);
 
         this.viewport = viewport;
@@ -182,7 +182,7 @@ public class SVGLength {
         case SVG_LENGTHTYPE_EMS:
             return result + "em";
         case SVG_LENGTHTYPE_EXS:
-            return result = "ex";
+            return result + "ex";
         case SVG_LENGTHTYPE_PX:
             return result + "px";
         case SVG_LENGTHTYPE_CM:
@@ -344,4 +344,12 @@ public class SVGLength {
         return super.equals(other);
     }
 
+    public float getValueFromString(){
+    	return valueInSpecifiedUnits;
+    }
+    
+    public void printUnit(){
+    	System.out.println("UNIT TYPE  "+unitType);
+    	System.out.println("UNIT VALUE  "+valueInSpecifiedUnits);
+    }
 }

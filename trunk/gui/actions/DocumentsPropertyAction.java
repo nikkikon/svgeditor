@@ -12,6 +12,7 @@ public class DocumentsPropertyAction extends AbstractAction{
 	public DocumentsPropertyAction(Frame frame){
 		super("Document Properties");
 		this.frame = frame;
+		
 	}
 
 	@Override

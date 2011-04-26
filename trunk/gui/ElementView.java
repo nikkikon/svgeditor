@@ -29,8 +29,10 @@ public class ElementView extends JComponent{
 	private ResizeMouseListener rml;
 	private int x,y,h,w,strokewidth;
 	private SVGElement elem;
-	public ElementView(SVGElement elem){
+	private View view;
+	public ElementView(SVGElement elem,View view){
 		//paintElement(g,elem);
+		this.view = view;
 		this.elem = elem;
 		ResizeMouseListener rml = new ResizeMouseListener(this,elem.getShape());
         MouseInputListener resizeListener = rml.getListener();
@@ -92,6 +94,10 @@ public class ElementView extends JComponent{
 	
    public Element getElement(){
 	   return elem.getElement();
+   }
+   
+   public View getView(){
+	   return view;
    }
 	/*public void paintElement(Graphics2D g, SVGElement elem) {
 

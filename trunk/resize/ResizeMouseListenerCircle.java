@@ -6,6 +6,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JComponent;
+import javax.swing.border.Border;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
@@ -47,27 +48,33 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			    public void mouseMoved(MouseEvent me) {
 			    	
 			      if (c.hasFocus()) {
-			    	 
 			    	  ResizeableBorderCircle border = (ResizeableBorderCircle)(c.getBorder());
-			          c.setCursor(Cursor.getPredefinedCursor(border.getCursor(me)));
-			          
-			      }
+			    	  c.setCursor(Cursor.getPredefinedCursor(border.getCursor(me)));
+			       }
 			    }
 
 			    public void mouseExited(MouseEvent mouseEvent) {
-			       c.setCursor(Cursor.getDefaultCursor());
+			    	 c.setCursor(Cursor.getDefaultCursor());
+			         
+			       
 			    }
 
 			    private int cursor;
 			    private Point startPos = null;
 
 			    public void mousePressed(MouseEvent me) {
+			     
+					  ResizeableBorderCircle border = (ResizeableBorderCircle)(c.getBorder());
+				      cursor = border.getCursor(me);
+				      startPos = me.getPoint();
+				      c.requestFocus();
+	                  c.repaint();
+	                  c.getView().repaint();
+				  
 			      
-			      ResizeableBorderCircle border = (ResizeableBorderCircle)(c.getBorder());
-			      cursor = border.getCursor(me);
-			      startPos = me.getPoint();
-			      c.requestFocus();
-			      c.repaint();
+			     
+			    
+			     
 			      
 			      
 			    }

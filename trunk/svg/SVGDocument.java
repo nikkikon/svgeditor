@@ -83,4 +83,5 @@ public class SVGDocument implements SVGViewport, Iterable<SVGElement> {
     public SVGIterator iterator() {
         return new SVGIterator(this);
     }
+
 }
