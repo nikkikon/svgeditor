@@ -99,11 +99,11 @@ public class SVGRectElement extends SVGStylableElement {
     public float getAbsHeight() {
         return Math.abs(height.getValue());
     }
-
+/*
     public Shape createShape2() {
         return new Rectangle2D.Float(getAbsLeft(), getAbsTop(), getAbsWidth(), getAbsHeight());
     }
-
+*/
     public Shape createShape() {
         return new Rectangle2D.Float(getStrokeWidth().getValue()/2+8,getStrokeWidth().getValue()/2+8,getAbsWidth(), getAbsHeight());
     }
@@ -135,6 +135,12 @@ public class SVGRectElement extends SVGStylableElement {
 	public Element getElement() {
 		// TODO Auto-generated method stub
 		return elem;
+	}
+
+	@Override
+	public int getLineType() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

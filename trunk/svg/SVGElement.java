@@ -73,4 +73,6 @@ public abstract class SVGElement {
     public abstract boolean isPaint();
     public abstract void setPaint();
     public abstract Element getElement();
+    public abstract int getLineType();
+    
 }

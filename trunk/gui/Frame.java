@@ -69,12 +69,14 @@ public class Frame extends JFrame {
         view = new View(this);
         getContentPane().add(view);
         newFile();
+        
         try {
 			creatTempFile(new File("./null.svg.tmp"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
         // Set an initial view size in case the document size is based on the view
         view.setSize(new Dimension(480, 360));
 

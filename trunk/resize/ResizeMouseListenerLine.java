@@ -81,6 +81,7 @@ public class ResizeMouseListenerLine extends ResizeMouseListener implements Mous
 			            if (!(h - dy < 50)) {
 			              c.setBounds(x, y + dy, w, h - dy);
 			              resize();
+			            
 			            }
 			            break;
 
