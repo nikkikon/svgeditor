@@ -28,7 +28,6 @@ public class ConfirmAction extends AbstractAction{
 		SVGLength width = frame.getFrame().getDocument().getWidth();
 		width.setValueFromString(frame.getNewWidth());
 		width.printUnit();
-		
 		SVGLength heigth = frame.getFrame().getDocument().getHeight();
 		heigth.setValueFromString(frame.getNewHeigth());
 		heigth.printUnit();
@@ -38,12 +37,14 @@ public class ConfirmAction extends AbstractAction{
 		
 		frame.dispose();
 		frame.getFrame().repaint();
+		
 		try {
 			frame.getFrame().writeFile();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 	
 	

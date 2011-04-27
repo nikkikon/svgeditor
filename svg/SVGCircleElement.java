@@ -97,4 +97,10 @@ public class SVGCircleElement extends SVGStylableElement {
 		return elem;
 	}
 
+	@Override
+	public int getLineType() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

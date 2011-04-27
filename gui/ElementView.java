@@ -34,13 +34,11 @@ public class ElementView extends JComponent{
 		//paintElement(g,elem);
 		this.view = view;
 		this.elem = elem;
-		ResizeMouseListener rml = new ResizeMouseListener(this,elem.getShape());
-        MouseInputListener resizeListener = rml.getListener();
-        ResizeableBorder  rb = rml.getBorder();
-        addMouseListener(resizeListener);
-	    addMouseMotionListener(resizeListener);
-	    setBorder(rb);
-	    System.out.println(elem);
+		
+		//elem.setComponent(); bind the component to svgelement
+	
+		
+	    //System.out.println(elem);
 	   
 	    	x = (int) elem.getDemision()[0];
 	    	y = (int) elem.getDemision()[1];
@@ -54,6 +52,12 @@ public class ElementView extends JComponent{
 	    	else{
 	    		setBounds(x-8-strokewidth/2, y-8-strokewidth/2, w+strokewidth+16, h+strokewidth+16);	
 	    	}
+	    	ResizeMouseListener rml = new ResizeMouseListener(this,elem.getShape(),elem.getLineType());
+	        MouseInputListener resizeListener = rml.getListener();
+	        ResizeableBorder  rb = rml.getBorder();
+	        addMouseListener(resizeListener);
+		    addMouseMotionListener(resizeListener);
+		    setBorder(rb);
 	    	
 	}
    public void paint(Graphics g){
@@ -65,7 +69,6 @@ public class ElementView extends JComponent{
             return;
 
         Shape shape = elem.createShape();
-
         SVGStylable style = (SVGStylable) elem;
         SVGPaint fillPaint = style.getFill();
         SVGPaint strokePaint = style.getStroke();

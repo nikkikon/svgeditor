@@ -105,5 +105,10 @@ public class SVGGroup extends SVGElement implements Iterable<SVGElement> {
 		// TODO Auto-generated method stub
 		return elem;
 	}
+	@Override
+	public int getLineType() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 
 }

@@ -12,14 +12,12 @@ public class ResizeableBorderCircle extends ResizeableBorder implements Border{
 
 	
 	private int locations[] = {
-			SwingConstants.NORTH, SwingConstants.SOUTH, SwingConstants.WEST,
-		    SwingConstants.EAST 
+			SwingConstants.NORTH
 		    
 	};
 	
 	private int cursors[] = {
-			Cursor.N_RESIZE_CURSOR, Cursor.S_RESIZE_CURSOR, Cursor.W_RESIZE_CURSOR,
-		    Cursor.E_RESIZE_CURSOR
+			Cursor.N_RESIZE_CURSOR
 			
 	};
 	public ResizeableBorderCircle(int dist) {

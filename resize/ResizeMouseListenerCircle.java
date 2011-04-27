@@ -4,6 +4,7 @@ import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 
 import javax.swing.JComponent;
 import javax.swing.border.Border;
@@ -11,7 +12,9 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.MouseInputListener;
 
 import svgedit.gui.ElementView;
+import svgedit.svg.SVGCircleElement;
 import svgedit.svg.SVGElement;
+import svgedit.xml.XMLReader;
 
 
 
@@ -21,12 +24,24 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 
 	private ElementView c;
 	private MouseInputListener resizeListener;
-	
+	private String newAttributeValue;
+	private SVGCircleElement circle;
+	private float newX;
+	private float newY;
+	private String newXString;
+	private String newYString;
 	
 	public ResizeMouseListenerCircle(ElementView c,ResizeableBorder border){
 		this.c = c;
 		addResizeMouseListener();
-		
+		circle = (SVGCircleElement) c.getSVGElement();
+		newAttributeValue = String.valueOf(circle.getR().getValueInSpecifiedUnits());
+	    newX = circle.getCX().getValue();
+	    newY = circle.getCY().getValue();
+	    
+	    newXString = String.valueOf(circle.getCX().getValueInSpecifiedUnits());
+	    newYString = String.valueOf(circle.getCY().getValueInSpecifiedUnits());
+	    //System.out.println(newAttributeValue);
 	}
 	
 	@Override
@@ -71,12 +86,6 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 	                  c.repaint();
 	                  c.getView().repaint();
 				  
-			      
-			     
-			    
-			     
-			      
-			      
 			    }
 
 			    public void mouseDragged(MouseEvent me) {
@@ -94,15 +103,23 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			        switch (cursor) {
 			          case Cursor.N_RESIZE_CURSOR:
 			            if (!(h - dy < 50)) {
-			              c.setBounds(x, y + dy, w, h - dy);
+			              //c.setBounds(x, y + dy, w, h - dy);
+			              c.setBounds(x + dy, y + dy, w-2*dy, h - 2*dy);
 			              resize();
+			              
+			              float newR = circle.getR().getValue()-dy;
+			              circle.getR().setValue(newR);
+			              c.repaint();
+			              newAttributeValue = String.valueOf(circle.getR().getValueInSpecifiedUnits())+circle.getR().getUserUnit();
+			              
 			            }
 			            break;
-
+/*
 			          case Cursor.S_RESIZE_CURSOR:
-			            if (!(h + dy < 50)) {
-			              c.setBounds(x, y, w, h + dy);
-			              startPos = me.getPoint();
+			           if (!(h + dy < 50)) {
+			                c.setBounds(x, y, w, h + dy);
+			            	//c.setBounds(x - dy, y - dy, w+2*dy, h + 2*dy);
+			            	startPos = me.getPoint();
 			              resize();
 			            }
 			            break;
@@ -120,44 +137,23 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			              startPos = me.getPoint();
 			              resize();
 			            }
-			            break;
-
-			          case Cursor.NW_RESIZE_CURSOR:
-			            if (!(w - dx < 50) && !(h - dy < 50)) {
-			              c.setBounds(x + dx, y + dy, w - dx, h - dy);
-			              resize();
-			            }
-			            break;
-
-			          case Cursor.NE_RESIZE_CURSOR:
-			            if (!(w + dx < 50) && !(h - dy < 50)) {
-			              c.setBounds(x, y + dy, w + dx, h - dy);
-			              startPos = new Point(me.getX(), startPos.y);
-			              resize();
-			            }
-			            break;
-
-			          case Cursor.SW_RESIZE_CURSOR:
-			            if (!(w - dx < 50) && !(h + dy < 50)) {
-			              c.setBounds(x + dx, y, w - dx, h + dy);
-			              startPos = new Point(startPos.x, me.getY());
-			              resize();
-			            }
-			            break;
-
-			          case Cursor.SE_RESIZE_CURSOR:
-			            if (!(w + dx < 50) && !(h + dy < 50)) {
-			              c.setBounds(x, y, w + dx, h + dy);
-			              startPos = me.getPoint();
-			              resize();
-			            }
-			          break;
-
-			          case Cursor.MOVE_CURSOR:
+	            break;
+	            */		
+                      case Cursor.MOVE_CURSOR:
 			            Rectangle bounds = c.getBounds();
 			            bounds.translate(dx, dy);
 			            c.setBounds(bounds);
 			            resize();
+			             
+			            newX +=dx;
+			            newY +=dy;
+			            circle.getCX().setValue(newX);
+			            circle.getCY().setValue(newY);
+			            
+			            newXString = String.valueOf(circle.getCX().getValueInSpecifiedUnits());
+			            newYString = String.valueOf(circle.getCY().getValueInSpecifiedUnits());
+			            
+
 			          }
 
 
@@ -167,7 +163,16 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 
 			   public void mouseReleased(MouseEvent mouseEvent) {
 			     startPos = null;
-			    }
+			     c.getElement().setAttribute("r", newAttributeValue);
+			     c.getElement().setAttribute("cx", newXString);
+			     c.getElement().setAttribute("cy", newYString);
+			     try {
+					c.getView().getFrame().writeFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
+			   }
 			  };
 	}
 

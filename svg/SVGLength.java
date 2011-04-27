@@ -250,9 +250,11 @@ public class SVGLength {
             unitType = SVG_LENGTHTYPE_PC;
         else if (unitString.equals("%"))
             unitType = SVG_LENGTHTYPE_PERCENTAGE;
-        else
+        else 
+        	
             throw new RuntimeException("Unexpected unit string");
     }
+    
 
     /**
      * Copies unit and value from another length into this length.
@@ -346,6 +348,36 @@ public class SVGLength {
 
     public float getValueFromString(){
     	return valueInSpecifiedUnits;
+    }
+    /**
+     * Gets the unit of this length.
+     * 
+     * Specified by 7.10 Units
+     * 
+     * @return the unit of the length
+     */
+    public String getUserUnit(){
+    	if (unitType == SVG_LENGTHTYPE_EMS)
+            return "em";
+        else if (unitType == SVG_LENGTHTYPE_EXS)
+            return "ex";
+        else if (unitType == SVG_LENGTHTYPE_PX)
+        	return "px";
+        else if (unitType == SVG_LENGTHTYPE_IN)
+        	return "in";
+        else if (unitType == SVG_LENGTHTYPE_CM)
+        	return "cm";
+        else if (unitType == SVG_LENGTHTYPE_MM)
+        	return "mm";
+        else if (unitType == SVG_LENGTHTYPE_PT)
+        	return "pt";
+        else if (unitType == SVG_LENGTHTYPE_PC)
+        	return "pc";
+        else if (unitType == SVG_LENGTHTYPE_PERCENTAGE)
+        	return "%";
+        else if(unitType == SVG_LENGTHTYPE_NUMBER)
+        	return "";
+            throw new RuntimeException("Unexpected unit string");
     }
     
     public void printUnit(){

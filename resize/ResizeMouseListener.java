@@ -12,9 +12,11 @@ public class ResizeMouseListener {
 	private String shape;
 	private ElementView c;
 	private ResizeableBorder rb;
-	public ResizeMouseListener(ElementView c,String shape){
+	private int lineType;
+	public ResizeMouseListener(ElementView c,String shape,int lineType){
 		this.c = c;
 		this.shape = shape;
+		this.lineType = lineType;
 	};
 	public ResizeMouseListener(){
 		
@@ -26,7 +28,7 @@ public class ResizeMouseListener {
 			return new ResizeMouseListenerRect(c,rb).getListener();
 		}
 		else if(shape.equals("Line")){
-			rb = new ResizeableBorderLine(8);
+			rb = new ResizeableBorderLine(8,lineType);
 			return new ResizeMouseListenerLine(c,rb).getListener();
 		}
 		else if(shape.equals("Circle")){
