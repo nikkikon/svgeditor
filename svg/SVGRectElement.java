@@ -2,8 +2,13 @@ package svgedit.svg;
 
 import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+
+import javax.swing.JComponent;
 
 import org.w3c.dom.Element;
+
+import svgedit.gui.ElementView;
 
 /** Element describing a rectangle.
  *
@@ -17,6 +22,7 @@ public class SVGRectElement extends SVGStylableElement {
     private SVGLength height;
     private boolean isPaint;
     private Element elem;
+    private ElementView jc;
     public SVGRectElement(SVGDocument document,Element elem) {
         super(document);
         this.elem = elem;
@@ -143,4 +149,50 @@ public class SVGRectElement extends SVGStylableElement {
 		return 0;
 	}
 
+	
+	public void setComponent(ElementView jc) {
+		// TODO Auto-generated method stub
+		this.jc = jc;
+	}
+
+	@Override
+	public ElementView getComponent() {
+		// TODO Auto-generated method stub
+		return jc;
+	}
+
+	@Override
+	public void setOffset(float dx,float dy){
+		float newX;
+		float newY;
+		newX = getX().getValue();
+		newY = getY().getValue();
+		
+		System.out.println(newX);
+		System.out.println(newY);
+		newX +=dx;
+        newY +=dy;
+        System.out.println(newX);
+        System.out.println(newY);
+        System.out.println("DX 2= "+dx);
+        getX().setValue(newX);
+        getY().setValue(newY);
+     }
+
+	@Override
+	public void setOffsetBackToFile() {
+		// TODO Auto-generated method stub
+		String newXString;
+		String newYString;
+		 newXString = String.valueOf(getX().getValueInSpecifiedUnits())+getX().getUserUnit();
+	     newYString = String.valueOf(getY().getValueInSpecifiedUnits())+getY().getUserUnit();
+		jc.getElement().setAttribute("cx", newXString);
+		jc.getElement().setAttribute("cy", newYString);
+		try {
+			jc.getView().getFrame().writeFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
 }

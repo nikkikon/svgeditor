@@ -74,12 +74,20 @@ public class View extends JComponent implements SVGViewport {
         for (SVGElement elem : document) {
         	
         	if(!elem.isPaint()){
-        		elementView = new ElementView(elem,this);
+        		
+        		try{elementView = new ElementView(elem,this);}
+        		catch(Exception e){
+        			//e.printStackTrace();
+        			//System.out.println("Unable to create the element view");
+        			continue;
+        		}
+        		
             	//elementView.paintElement(g, elem);
             	add(elementView);
             	frame.addJComponent(elementView);
-            	
             	elem.setPaint();
+            	elem.setComponent(elementView);	
+        	    System.out.println("COMPONENT"+elementView.getSVGElement().getComponent());
         	}
         	
     	

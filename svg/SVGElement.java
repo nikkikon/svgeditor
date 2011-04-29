@@ -2,7 +2,11 @@ package svgedit.svg;
 
 import java.awt.Shape;
 
+import javax.swing.JComponent;
+
 import org.w3c.dom.Element;
+
+import svgedit.gui.ElementView;
 
 /** An SVG visual element.
  *
@@ -74,5 +78,8 @@ public abstract class SVGElement {
     public abstract void setPaint();
     public abstract Element getElement();
     public abstract int getLineType();
-    
+    public abstract void setComponent(ElementView jc);
+    public abstract ElementView getComponent();
+    public abstract void setOffset(float offsetX,float offsetY);
+    public abstract void setOffsetBackToFile();
 }

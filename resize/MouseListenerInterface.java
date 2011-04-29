@@ -9,5 +9,5 @@ import svgedit.svg.SVGElement;
 	public void resize();
 	public MouseInputListener getListener();
 	public SVGElement getSVGElement();
-
+	public void setOffset(int dx,int dy);
 }
