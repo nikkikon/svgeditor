@@ -31,10 +31,17 @@ public class SaveAsAction extends AbstractAction{
         dialog.showSaveDialog(null);
         
         String savePath = dialog.getCurrentDirectory().getPath()+"\\";
-        String savedFileName = dialog.getSelectedFile().getName()+".svg";
+        File saveAsFile = null;
+        try{
+    	   String savedFileName = dialog.getSelectedFile().getName()+".svg";
+    	   saveAsFile =  new File(savePath+savedFileName);
+       }
+        catch (Exception ex){
+        	//System.out.println("MUST ENTER A FILE NAME");
+        }
         
         
-        	File saveAsFile =  new File(savePath+savedFileName);
+        	
             
             try {
     			fileCopy(frame.getTempFile(),saveAsFile);

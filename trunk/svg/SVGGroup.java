@@ -4,7 +4,11 @@ import java.awt.Shape;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.swing.JComponent;
+
 import org.w3c.dom.Element;
+
+import svgedit.gui.ElementView;
 
 /** Represents a {@literal 'g'} element in the document.
  * 
@@ -17,6 +21,7 @@ public class SVGGroup extends SVGElement implements Iterable<SVGElement> {
     private ArrayList<SVGElement> children;
     private boolean isPaint;
     private Element elem;
+    private ElementView jc;
     public SVGGroup(SVGDocument document,Element elem) {
         super(document);
         this.elem = elem;
@@ -109,6 +114,27 @@ public class SVGGroup extends SVGElement implements Iterable<SVGElement> {
 	public int getLineType() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public void setComponent(ElementView jc) {
+		// TODO Auto-generated method stub
+		this.jc = null;
+	}
+
+	@Override
+	public ElementView getComponent() {
+		// TODO Auto-generated method stub
+		return jc;
+	}
+	@Override
+	public void setOffset(float dx, float dy) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setOffsetBackToFile() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -161,5 +161,12 @@ public class ResizeMouseListenerLine extends ResizeMouseListener implements Mous
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public void setOffset(int dx, int dy) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 }

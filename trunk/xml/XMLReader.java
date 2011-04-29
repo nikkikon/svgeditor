@@ -17,7 +17,6 @@ public class XMLReader {
     private boolean fail;
     private static Document doc; 
     private SVGDocument document;
-
     private static SVGRootElement svgRootElement;
     /** Creates an {@link svgedit.svg.SVGDocument} from a file.  Any errors
      * in the file are logged, and will throw an {@link IOException}.
@@ -61,8 +60,8 @@ public class XMLReader {
 	// Read document properties
 	readLengthAttribute(elem, "width", document.getWidth());
 	readLengthAttribute(elem, "height", document.getHeight());
-
-	readGroupChildrenElements(elem, document.getRootGroup());
+    readGroupChildrenElements(elem, document.getRootGroup());
+    
     }
 
     private void creatSVGRootElement(Element elem) {
@@ -233,4 +232,5 @@ public class XMLReader {
     public static SVGRootElement getsvgRootElement(){
     	return svgRootElement;
     }
+
 }

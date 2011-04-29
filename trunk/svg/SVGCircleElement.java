@@ -2,8 +2,13 @@ package svgedit.svg;
 
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
+import java.io.IOException;
+
+import javax.swing.JComponent;
 
 import org.w3c.dom.Element;
+
+import svgedit.gui.ElementView;
 
 /** Element describing a circle.
  * 
@@ -16,6 +21,7 @@ public class SVGCircleElement extends SVGStylableElement {
     private SVGLength cy;
     private boolean isPaint;
     private Element elem;
+    private ElementView jc;
     public SVGCircleElement(SVGDocument document,Element elem) {
         super(document);
         isPaint = false;
@@ -103,4 +109,46 @@ public class SVGCircleElement extends SVGStylableElement {
 		return 0;
 	}
 
+	@Override
+	public void setComponent(ElementView jc) {
+		// TODO Auto-generated method stub
+		this.jc = jc;
+	}
+
+	@Override
+	public ElementView getComponent() {
+		// TODO Auto-generated method stub
+		return jc;
+	}
+	
+	
+
+	public void setOffset(float dx,float dy){
+		float newX;
+		float newY;
+		newX = getCX().getValue();
+		newY = getCY().getValue();
+		newX +=dx;
+        newY +=dy;
+        getCX().setValue(newX);
+        getCY().setValue(newY);
+     }
+
+	@Override
+	public void setOffsetBackToFile() {
+		// TODO Auto-generated method stub
+		String newXString;
+		String newYString;
+		 newXString = String.valueOf(getCX().getValueInSpecifiedUnits())+getCX().getUserUnit();
+	     newYString = String.valueOf(getCY().getValueInSpecifiedUnits())+getCY().getUserUnit();
+		System.out.println("BACK TO FILE "+newXString );
+	     jc.getElement().setAttribute("cx", newXString);
+		jc.getElement().setAttribute("cy", newYString);
+		try {
+			jc.getView().getFrame().writeFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
 }

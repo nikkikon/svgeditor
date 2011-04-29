@@ -1,11 +1,14 @@
 package svgedit.resize;
 
 import java.awt.Component;
+import java.awt.Rectangle;
 
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputListener;
 
 import svgedit.gui.ElementView;
+import svgedit.svg.SVGElement;
+import svgedit.svg.SVGGroup;
 
 public class ResizeMouseListener {
 	
@@ -42,6 +45,9 @@ public class ResizeMouseListener {
 		return rb;
 	}
 	
+
+
+
 
 }
 

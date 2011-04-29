@@ -21,6 +21,7 @@ import svgedit.resize.ResizeMouseListenerRect;
 import svgedit.resize.ResizeableBorder;
 import svgedit.resize.ResizeableBorderRectangle;
 import svgedit.svg.SVGElement;
+import svgedit.svg.SVGGroup;
 import svgedit.svg.SVGLength;
 import svgedit.svg.SVGPaint;
 import svgedit.svg.SVGStylable;
@@ -52,13 +53,13 @@ public class ElementView extends JComponent{
 	    	else{
 	    		setBounds(x-8-strokewidth/2, y-8-strokewidth/2, w+strokewidth+16, h+strokewidth+16);	
 	    	}
-	    	ResizeMouseListener rml = new ResizeMouseListener(this,elem.getShape(),elem.getLineType());
+	    	rml = new ResizeMouseListener(this,elem.getShape(),elem.getLineType());
 	        MouseInputListener resizeListener = rml.getListener();
 	        ResizeableBorder  rb = rml.getBorder();
 	        addMouseListener(resizeListener);
 		    addMouseMotionListener(resizeListener);
 		    setBorder(rb);
-	    	
+		    
 	}
    public void paint(Graphics g){
 		super.paint(g);
@@ -101,6 +102,16 @@ public class ElementView extends JComponent{
    
    public View getView(){
 	   return view;
+   }
+   
+   public SVGGroup getGroup(){
+	   return elem.getParent();
+   }
+   
+   public ResizeMouseListener getResizeMouseListener(){
+
+		   return rml;
+
    }
 	/*public void paintElement(Graphics2D g, SVGElement elem) {
 

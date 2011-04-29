@@ -2,8 +2,13 @@ package svgedit.svg;
 
 import java.awt.Shape;
 import java.awt.geom.Line2D;
+import java.io.IOException;
+
+import javax.swing.JComponent;
 
 import org.w3c.dom.Element;
+
+import svgedit.gui.ElementView;
 
 /** Element describing a line segment.
  *
@@ -20,6 +25,7 @@ public class SVGLineElement extends SVGStylableElement {
     private static int UP_DOWN_LINE =1;
     private static int DOWN_UP_LINE= 2;
     private int LINE_TYPE;
+    private ElementView jc;
     public SVGLineElement(SVGDocument document,Element elem) {
         super(document);
         isPaint = false;
@@ -146,6 +152,52 @@ public class SVGLineElement extends SVGStylableElement {
 	public Element getElement() {
 		// TODO Auto-generated method stub
 		return elem;
+	}
+	
+	public void setComponent(ElementView jc) {
+		// TODO Auto-generated method stub
+		this.jc = jc;
+	}
+
+	@Override
+	public ElementView getComponent() {
+		// TODO Auto-generated method stub
+		return jc;
+	}
+
+	@Override
+	public void setOffset(float dx,float dy){
+		float newX;
+		float newY;
+		newX = getX1().getValue();
+		newY = getY1().getValue();
+		
+		System.out.println(newX);
+		System.out.println(newY);
+		newX +=dx;
+        newY +=dy;
+        System.out.println(newX);
+        System.out.println(newY);
+        System.out.println("DX 2= "+dx);
+        getX1().setValue(newX);
+        getY1().setValue(newY);
+     }
+
+	@Override
+	public void setOffsetBackToFile() {
+		// TODO Auto-generated method stub
+		String newXString;
+		String newYString;
+		 newXString = String.valueOf(getX1().getValueInSpecifiedUnits())+getX1().getUserUnit();
+	     newYString = String.valueOf(getY1().getValueInSpecifiedUnits())+getY1().getUserUnit();
+		jc.getElement().setAttribute("cx", newXString);
+		jc.getElement().setAttribute("cy", newYString);
+		try {
+			jc.getView().getFrame().writeFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
 	}
 
 }
