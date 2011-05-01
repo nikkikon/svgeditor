@@ -22,6 +22,7 @@ import svgedit.gui.actions.OpenDocumentAction;
 import svgedit.gui.actions.QuitAction;
 import svgedit.gui.actions.SaveAction;
 import svgedit.gui.actions.SaveAsAction;
+import svgedit.gui.actions.SelectMode;
 
 public class MainMenuBar extends JMenuBar{
 	private Action openAction;
@@ -34,7 +35,8 @@ public class MainMenuBar extends JMenuBar{
     private Action insert_circleAction;
     private Action insert_lineAction;
     private Action editsvg;
-    
+    private Action selectMode;
+   
     private Frame frame;
     public MainMenuBar(Frame frame){
     	this.frame = frame;
@@ -58,7 +60,7 @@ public class MainMenuBar extends JMenuBar{
         newAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         saveAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         save_asAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK|InputEvent.SHIFT_DOWN_MASK));
-
+        selectMode = new SelectMode(frame);
         // Create menus
         
         //jp.add(menuBar);
@@ -75,6 +77,7 @@ public class MainMenuBar extends JMenuBar{
         fileMenu.add(new JMenuItem(quitAction));
         
         //--------------------------------------------------------------
+        insertMenu.add(new JMenuItem(selectMode));
         insertMenu.add(new JMenuItem(insert_rectangleAction));
         insertMenu.add(new JMenuItem(insert_circleAction));
         insertMenu.add(new JMenuItem(insert_lineAction));

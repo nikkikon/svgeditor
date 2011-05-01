@@ -2,12 +2,14 @@ package svgedit.gui;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Stroke;
 import javax.swing.JComponent;
 
+import svgedit.select.selectMouseListener;
 import svgedit.svg.SVGDocument;
 import svgedit.svg.SVGElement;
 import svgedit.svg.SVGLength;
@@ -22,6 +24,7 @@ public class View extends JComponent implements SVGViewport {
     private SVGDocument document;
     private ElementView elementView;
     private Frame frame;
+    private selectMouseListener sml;
     //private int paintTimes;
     /** Creates a new view */
    // public View() {
@@ -29,6 +32,10 @@ public class View extends JComponent implements SVGViewport {
     //}
     public View(Frame frame) {
     	this.frame = frame;
+    	sml = new selectMouseListener(frame);
+    	
+		addMouseListener(sml.getListener());
+		addMouseMotionListener(sml.getListener());
     }
 
     public float getViewportWidth() {
@@ -87,7 +94,7 @@ public class View extends JComponent implements SVGViewport {
             	frame.addJComponent(elementView);
             	elem.setPaint();
             	elem.setComponent(elementView);	
-        	    System.out.println("COMPONENT"+elementView.getSVGElement().getComponent());
+        	    
         	}
         	
     	
@@ -142,5 +149,12 @@ public class View extends JComponent implements SVGViewport {
         this.document = document;
         repaint();
     }
+    
+   public void clearListener(){
+	   for(int i = 0;i<frame.getView().getMouseListeners().length;i++){
+       	frame.getView().removeMouseListener(frame.getView().getMouseListeners()[i]);
+   		frame.getView().removeMouseMotionListener(frame.getView().getMouseMotionListeners()[i]);
+       }
+   }
 
 }

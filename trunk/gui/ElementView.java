@@ -1,8 +1,10 @@
 package svgedit.gui;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.Stroke;
 
@@ -14,6 +16,7 @@ import javax.swing.event.MouseInputListener;
 import org.w3c.dom.Element;
 
 
+import svgedit.editboxlistener.EditBoxListener;
 import svgedit.resize.ResizeMouseListener;
 import svgedit.resize.ResizeMouseListenerCircle;
 import svgedit.resize.ResizeMouseListenerLine;
@@ -31,6 +34,8 @@ public class ElementView extends JComponent{
 	private int x,y,h,w,strokewidth;
 	private SVGElement elem;
 	private View view;
+	private boolean isIntersect=false;
+	private boolean isSelected = false;
 	public ElementView(SVGElement elem,View view){
 		//paintElement(g,elem);
 		this.view = view;
@@ -59,7 +64,9 @@ public class ElementView extends JComponent{
 	        addMouseListener(resizeListener);
 		    addMouseMotionListener(resizeListener);
 		    setBorder(rb);
-		    
+		    EditBoxListener ebl = new EditBoxListener(this,elem.getShape());
+	    	addMouseListener(ebl.getListener());
+	
 	}
    public void paint(Graphics g){
 		super.paint(g);
@@ -88,9 +95,23 @@ public class ElementView extends JComponent{
             g.setColor(strokePaint.getRGBColor());
             ((Graphics2D) g).draw(shape);
         }
-        
+       
        
 	}
+   public void setisSelected(boolean flag){
+	   isSelected = flag;
+   }
+   public boolean getisSelected(){
+	   return isSelected;
+   }
+   
+   
+   public void setisIntersect(boolean flag){
+	   isIntersect = flag;
+   }
+   public boolean getisIntersect(){
+	   return isIntersect;
+   }
    
    public SVGElement getSVGElement(){
 	   return elem;
@@ -111,8 +132,9 @@ public class ElementView extends JComponent{
    public ResizeMouseListener getResizeMouseListener(){
 
 		   return rml;
+ }
 
-   }
+   
 	/*public void paintElement(Graphics2D g, SVGElement elem) {
 
 		

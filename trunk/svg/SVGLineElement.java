@@ -167,31 +167,49 @@ public class SVGLineElement extends SVGStylableElement {
 
 	@Override
 	public void setOffset(float dx,float dy){
-		float newX;
-		float newY;
-		newX = getX1().getValue();
-		newY = getY1().getValue();
-		
-		System.out.println(newX);
-		System.out.println(newY);
-		newX +=dx;
-        newY +=dy;
-        System.out.println(newX);
-        System.out.println(newY);
-        System.out.println("DX 2= "+dx);
-        getX1().setValue(newX);
-        getY1().setValue(newY);
-     }
+		float newX1;
+		float newY1;
+		float newX2;
+		float newY2;
+		newX1 = getX1().getValue();
+		newY1 = getY1().getValue();
+		newX2 = getX2().getValue();
+		newY2 = getY2().getValue();
+		System.out.println("OLDX1"+newX1); 
+        System.out.println("OLDY1"+newY1); 
+		newX1 +=dx;
+        newY1 +=dy;
+        newX2 +=dx;
+        newY2 +=dy;
+        getX1().setValue(newX1);
+        getY1().setValue(newY1);
+        getX2().setValue(newX2);
+        getY2().setValue(newY2);
+        System.out.println("OFFSET DX"+dx);
+        System.out.println("OFFSET DY"+dy);
+        
+        System.out.println("NEWX1"+newX1); 
+        System.out.println("NEWY1"+newY1);
+       
+        
+	}
 
 	@Override
 	public void setOffsetBackToFile() {
 		// TODO Auto-generated method stub
-		String newXString;
-		String newYString;
-		 newXString = String.valueOf(getX1().getValueInSpecifiedUnits())+getX1().getUserUnit();
-	     newYString = String.valueOf(getY1().getValueInSpecifiedUnits())+getY1().getUserUnit();
-		jc.getElement().setAttribute("cx", newXString);
-		jc.getElement().setAttribute("cy", newYString);
+		String newX1String;
+		String newY1String;
+		String newX2String;
+		String newY2String;
+		 newX1String = String.valueOf(getX1().getValueInSpecifiedUnits())+getX1().getUserUnit();
+	     newY1String = String.valueOf(getY1().getValueInSpecifiedUnits())+getY1().getUserUnit();
+		
+	     newX2String = String.valueOf(getX2().getValueInSpecifiedUnits())+getX1().getUserUnit();
+	     newY2String = String.valueOf(getY2().getValueInSpecifiedUnits())+getY1().getUserUnit();
+	    jc.getElement().setAttribute("x1", newX1String);
+		jc.getElement().setAttribute("y1", newY1String);
+		jc.getElement().setAttribute("x2", newX2String);
+		jc.getElement().setAttribute("y2", newY2String);
 		try {
 			jc.getView().getFrame().writeFile();
 		} catch (IOException e) {

@@ -8,8 +8,11 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JComponent;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+
+import svgedit.gui.ElementView;
 
 public class ResizeableBorder implements Border{
 
@@ -44,7 +47,7 @@ public class ResizeableBorder implements Border{
 	}
 	
 	protected int getCursor(MouseEvent me){
-		Component c = me.getComponent();
+		ElementView c = (ElementView) me.getComponent();
 		int w = c.getWidth();
 		int h = c.getHeight();
 		
@@ -57,13 +60,15 @@ public class ResizeableBorder implements Border{
 		}
 		return Cursor.MOVE_CURSOR;
 	}
-	
+
 	public void paintBorder(Component c, Graphics g, int x, int y,
 			int w, int h) {
 		// TODO Auto-generated method stub
 		//g.setColor(Color.WHITE);
 		//g.drawRect(x + dist, y + dist, w, h);
-		if(c.hasFocus()){
+		
+		if(c.hasFocus()||((ElementView) c).getisIntersect()){
+			//System.out.println(((ElementView) c).getisSelected());
 			for(int i =0; i<locations.length;i++){
 				Rectangle rect = getRectangle(x, y, w, h, locations[i]);
 				g.setColor(Color.WHITE);
@@ -71,8 +76,11 @@ public class ResizeableBorder implements Border{
 		        g.setColor(Color.BLACK);
 		        g.drawRect(rect.x, rect.y, rect.width - 1, rect.height - 1);
 			}
-			}
+		}
+		((ElementView) c).setisIntersect(false);
 	}
+	
+
 	
 
 	

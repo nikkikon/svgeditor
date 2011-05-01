@@ -45,7 +45,14 @@ public class ResizeMouseListener {
 		return rb;
 	}
 	
-
+public void setisSelectedforJComponent(ElementView c){
+	c.setisSelected(true);
+    for(int i =0;i<c.getView().getFrame().getJCVector().size();i++){
+  	  if(!(c.getView().getFrame().getJCVector().get(i).equals(c))){
+  		  c.getView().getFrame().getJCVector().get(i).setisSelected(false);
+  	  }
+    }
+}
 
 
 

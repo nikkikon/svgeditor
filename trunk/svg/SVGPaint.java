@@ -330,7 +330,7 @@ public class SVGPaint {
      * @throws NumberFormatException
      *             if the string does not represent a color
      */
-    private Color parseColor(String s) {
+    public Color parseColor(String s) {
         // color keyword
         if (colorKeywords.containsKey(s))
             return colorKeywords.get(s);
