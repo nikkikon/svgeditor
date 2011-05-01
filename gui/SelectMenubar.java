@@ -1,10 +1,15 @@
 package svgedit.gui;
 
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 
 import svgedit.gui.actions.DeleteAction;
 import svgedit.gui.actions.GroupAction;
@@ -29,6 +34,8 @@ public class SelectMenubar extends JMenuBar{
 		groupAction = new GroupAction(frame);
 		ungroupAction = new UngroupAction(frame);
 		deleteAction = new DeleteAction(frame);
+		selectAllAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+	       
 	    JMenu menu = new JMenu("Menu");	
 		add(menu);
 		menu.add(new JMenuItem(mainMenuAction));

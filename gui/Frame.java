@@ -47,21 +47,22 @@ public class Frame extends JFrame {
     private View view;
 
     // Actions available from the menu and toolbar */
-    
+    public ElementView currentElement;
     private SelectMenubar smb;
     private JMenuBar menuBar;
-    private EditBox eb;
+    public EditBox newBox;
     private DocumentPropertyEditBox dpe;
     private File tmpFile;
     private String filePath;
-    private Vector<JComponent> jc;
+    private Vector<ElementView> jc;
     private SVGRootElement svgRootElement;
+    public boolean editBoxExist = false;
     /** Creates a frame with a new, empty document. */
     public Frame() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         filePath = "DEFAULT";
         preferences = new Preferences();
-        jc = new Vector<JComponent>();
+        jc = new Vector<ElementView>();
         // Create all actions presented by the menu bar and toolbar
         menuBar = new MainMenuBar(this);
         add(menuBar, BorderLayout.NORTH);
@@ -170,19 +171,17 @@ public class Frame extends JFrame {
     	remove(smb);
     	add(menuBar,BorderLayout.NORTH);
     	menuBar.revalidate();
-    	System.out.println("DELETE");
-    	
-    }
-    
+     }
+  
     public void startEditBox(){
-        eb = new EditBox(this);
-		addSelectMenu();
+       addSelectMenu();
     }
+  
     
-    public void closeEditBox(){
-    	eb.dispose();
+    public void closeEditBox0(){
+    	newBox.dispose();
     }
-
+  
     public void startDocumentPropertyEditBox(){
     	dpe = new DocumentPropertyEditBox(this); 
     }  
@@ -203,11 +202,20 @@ public class Frame extends JFrame {
     public void setfilePath(String path){
     	filePath = path;
     }
-    public void addJComponent(JComponent c){
+    public void addJComponent(ElementView c){
     	jc.add(c);
     }
+    /** 
+     *  get the vector of all the ElementView
+     *
+     * @return Vector;
+     */
+    
+    public Vector<ElementView> getJCVector(){
+    	return jc;
+    } 
     public void clearView(){
-    	Iterator<JComponent> it = jc.iterator();
+    	Iterator<ElementView> it = jc.iterator();
     	while(it.hasNext()){
     		view.remove(it.next());
     		System.out.println("REMOVE");
@@ -222,8 +230,12 @@ public class Frame extends JFrame {
 	    XMLUtil.write(doc,tmpFile);
 	    
     }
+	
+	public void setNewBox(){
+    	newBox = new EditBox(this,currentElement);
+    }
 
-
+	
 
 	
     

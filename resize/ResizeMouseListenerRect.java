@@ -88,9 +88,7 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 			      startPos = me.getPoint();
 			      c.requestFocus();
 			      c.repaint();
-			      //System.out.println("ELEMENT BEFORE"+c.getElement().getAttribute("x"));
-			      //c.getElement().setAttribute("x", "666");
-			      //System.out.println("ELEMENT AFTER"+c.getElement().getAttribute("x"));
+			      setisSelectedforJComponent(c);
 			      c.getView().repaint();
 			    }
 
@@ -107,7 +105,9 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 			        int dy = me.getY() - startPos.y;
 			        newX = rect.getX().getValue();
 		            newY = rect.getY().getValue();
-			 
+		            
+		            newW = rect.getWidth().getValue();
+		    		newH = rect.getHeight().getValue();    
 			        switch (cursor) {
 			          case Cursor.N_RESIZE_CURSOR:
 			        	  if (!(h - dy < 50)) {
@@ -285,22 +285,19 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 					
 				   SVGGroup group =  c.getGroup();
 				   SVGElement[] children = group.getChildren();
-				   /*
-				   while(iterator.hasNext()){
-					   System.out.println(iterator.next());
-				   }
-				   */
+				
 				   for(int i = 0;i<children.length;i++){
 					   if(children[i].equals(c.getSVGElement())){
 						    continue;
 					   }
 					   try{
-						   
 						    ElementView otherComponent = (ElementView) children[i].getComponent();
 							Rectangle bounds =otherComponent.getBounds();
 				            bounds.translate(dx, dy);
 				            otherComponent.setBounds(bounds);
-				          
+				            otherComponent.getSVGElement().setOffset(dx, dy);
+				            c.getView().repaint(); 
+				            
 				        } 
 					   catch(Exception e){
 						   continue;
@@ -322,33 +319,18 @@ public class ResizeMouseListenerRect extends ResizeMouseListener implements Mous
 				     c.getElement().setAttribute("y", newYString);
 				     SVGGroup group =  c.getGroup();
 					 SVGElement[] children = group.getChildren();
-					 float offsetX,offsetY;
-		                offsetX = newX-oldX;
-		                offsetY = newY-oldY;
-		                
-		                if(!(offsetX==0)&&!(offsetY==0)){
-		                	for(int i = 0;i<children.length;i++){
-								   if(children[i].equals(c.getSVGElement())){
-									   System.out.println(c.getSVGElement().getParent()); 
-									   continue;
-								   }
-								   try{
-									   ElementView otherComponent = (ElementView) children[i].getComponent();
-									   
-									   
-							               
-							                System.out.println("R "+ offsetX);
-										    otherComponent.getSVGElement().setOffset(offsetX, offsetY);
-										    oldX = newX;
-										    oldY = newY;
-										    System.out.println("Write file back");
-							        } 
-								   catch(Exception e){
-									   //e.printStackTrace();
-									   continue;
-								   }
+					 for(int i = 0;i<children.length;i++){
+							   if(children[i].equals(c.getSVGElement())){
+								    continue;
 							   }
-		                }
+							   try{
+								   ElementView otherComponent = (ElementView) children[i].getComponent();
+								   otherComponent.getSVGElement().setOffsetBackToFile();
+						       } 
+							   catch(Exception e){
+								   continue;
+							   }
+					 }
 					 
 				     try {
 							c.getView().getFrame().writeFile();

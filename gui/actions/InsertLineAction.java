@@ -18,9 +18,13 @@ public class InsertLineAction extends AbstractAction{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		frame.getView().clearListener();
 		frame.setCursor(Cursor.CROSSHAIR_CURSOR);
-		frame.addMouseListener(insertListener.getListener());
-		frame.addMouseMotionListener(insertListener.getListener());
+		frame.getView().addMouseListener(insertListener.getListener());
+		frame.getView().addMouseMotionListener(insertListener.getListener());
+		//System.out.println("add listener");
+		//frame.removeMouseListener(frame.getMouseListeners()[0]);
+		//frame.removeMouseMotionListener(frame.getMouseMotionListeners()[0]);
 		System.out.println("INSERT LINE");
 	}
 	

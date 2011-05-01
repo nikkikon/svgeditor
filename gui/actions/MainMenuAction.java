@@ -20,6 +20,6 @@ public class MainMenuAction extends AbstractAction{
 		// TODO Auto-generated method stub
 		System.out.println("Main menu");
 	    frame.deleteSelectMenu();
-	    frame.closeEditBox();
+	   // frame.closeEditBox();
 	}
 }

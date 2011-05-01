@@ -132,6 +132,7 @@ public class SVGCircleElement extends SVGStylableElement {
         newY +=dy;
         getCX().setValue(newX);
         getCY().setValue(newY);
+       
      }
 
 	@Override
@@ -144,6 +145,7 @@ public class SVGCircleElement extends SVGStylableElement {
 		System.out.println("BACK TO FILE "+newXString );
 	     jc.getElement().setAttribute("cx", newXString);
 		jc.getElement().setAttribute("cy", newYString);
+		
 		try {
 			jc.getView().getFrame().writeFile();
 		} catch (IOException e) {

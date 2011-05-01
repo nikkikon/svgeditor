@@ -168,13 +168,9 @@ public class SVGRectElement extends SVGStylableElement {
 		newX = getX().getValue();
 		newY = getY().getValue();
 		
-		System.out.println(newX);
-		System.out.println(newY);
 		newX +=dx;
         newY +=dy;
-        System.out.println(newX);
-        System.out.println(newY);
-        System.out.println("DX 2= "+dx);
+      
         getX().setValue(newX);
         getY().setValue(newY);
      }
@@ -186,8 +182,8 @@ public class SVGRectElement extends SVGStylableElement {
 		String newYString;
 		 newXString = String.valueOf(getX().getValueInSpecifiedUnits())+getX().getUserUnit();
 	     newYString = String.valueOf(getY().getValueInSpecifiedUnits())+getY().getUserUnit();
-		jc.getElement().setAttribute("cx", newXString);
-		jc.getElement().setAttribute("cy", newYString);
+		jc.getElement().setAttribute("x", newXString);
+		jc.getElement().setAttribute("y", newYString);
 		try {
 			jc.getView().getFrame().writeFile();
 		} catch (IOException e) {

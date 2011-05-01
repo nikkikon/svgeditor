@@ -91,6 +91,8 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 				      startPos = me.getPoint();
 				      c.requestFocus();
 	                  c.repaint();
+	                  setisSelectedforJComponent(c);
+
 	                  c.getView().repaint();
 				  
 			    }
@@ -108,6 +110,7 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			        dy = me.getY() - startPos.y;
 			        newX = circle.getCX().getValue();
 		            newY = circle.getCY().getValue();
+		            
 			        switch (cursor) {
 			          case Cursor.N_RESIZE_CURSOR:
 			            if (!(h - dy < 50)) {
@@ -165,6 +168,8 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 				            bounds.translate(dx, dy);
 				            otherComponent.setBounds(bounds);
 				            otherComponent.getSVGElement().setOffset(dx, dy);
+				            c.getView().repaint(); 
+				            
 				        } 
 					   catch(Exception e){
 						   continue;
@@ -179,7 +184,7 @@ public class ResizeMouseListenerCircle extends ResizeMouseListener implements Mo
 			     newXString = String.valueOf(circle.getCX().getValueInSpecifiedUnits())+circle.getCX().getUserUnit();
 		         newYString = String.valueOf(circle.getCY().getValueInSpecifiedUnits())+circle.getCY().getUserUnit();
 		         newAttributeValue = String.valueOf(circle.getR().getValueInSpecifiedUnits())+circle.getR().getUserUnit();
-		         System.out.println("LAST CLIK "+newXString );
+		         
 			     c.getElement().setAttribute("r", newAttributeValue);
 			     c.getElement().setAttribute("cx", newXString);
 			     c.getElement().setAttribute("cy", newYString);

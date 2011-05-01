@@ -16,6 +16,16 @@ public class SelectAllAction extends AbstractAction{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		for(int i = 0;i<frame.getJCVector().size();i++){
+			  if(frame.getJCVector().get(i).getSVGElement().getParent().equals(frame.getDocument().getRootGroup())){
+					//System.out.println("INTERSECT"); 
+				 
+					frame.getJCVector().get(i).setisIntersect(true);
+					//System.out.println(frame.getJCVector().get(i).getisSelected());
+					frame.getJCVector().get(i).repaint();
+					
+				 }
+			 }
 		System.out.println("Select All");
 	}
 
