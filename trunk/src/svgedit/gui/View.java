@@ -1,0 +1,686 @@
+package svgedit.gui;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.util.ArrayList;
+import javax.swing.JComponent;
+import svgedit.gui.controlpoints.CircleRadiusControlPoint;
+
+import svgedit.svg.SVGDocument;
+import svgedit.svg.SVGElement;
+import svgedit.gui.controlpoints.ControlPoint;
+import svgedit.gui.controlpoints.PointControlPoint;
+import svgedit.gui.controlpoints.RectControlPoint;
+import svgedit.gui.manipulators.CompositeManipulator;
+import svgedit.gui.manipulators.ControlPointManipulator;
+import svgedit.gui.manipulators.SelectManipulator;
+import svgedit.gui.manipulators.Manipulator;
+import svgedit.gui.manipulators.MoveManipulator;
+import svgedit.svg.SVGCircleElement;
+import svgedit.svg.SVGLength;
+import svgedit.svg.SVGLineElement;
+import svgedit.svg.SVGPaint;
+import svgedit.svg.SVGStylable;
+import svgedit.svg.SVGGroup;
+import svgedit.svg.SVGRectElement;
+import svgedit.svg.SVGViewport;
+import svgedit.svg.SVGVisitor;
+
+/** An interactive view onto an {@link SVGDocument}. */
+@SuppressWarnings("serial")
+public class View extends JComponent implements SVGViewport {
+
+    private SVGDocument document;
+    private ArrayList<SVGElement> selectedElements;
+
+    private CompositeManipulator manipulator;
+
+    /** Dashed stroke used to draw selection border */
+    private Stroke dashedStroke;
+
+    /**
+     * Current visible style of selection
+     */
+    private SelectionStyle selectionStyle;
+
+    /** Default style for new elements */
+    private Style defaultStyle;
+
+    private ArrayList<ViewListener> viewListeners;
+
+    /** Adds a listener for view events
+     *
+     * @param il the listener to recieve view events
+     */
+    public void addViewListener(ViewListener il) {
+        viewListeners.add(il);
+    }
+
+    /** Removes a listener from the list of view listeners
+     *
+     * @param il the listener to remove
+     */
+    public void removeViewListener(ViewListener il) {
+        viewListeners.remove(il);
+    }
+
+    /** Handler for all mouse events.  Dispatches all events to the manipulators.
+     *
+     * Automatically repaints the view if a manipulator successfully handles
+     * an event.
+     */
+    private class ViewMouseListener extends MouseAdapter {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (manipulator.mouseClicked(e))
+                repaint();
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            requestFocusInWindow();
+
+            if (manipulator.mousePressed(e)) {
+                repaint();
+            } else {
+                // Check for hit on element, select and fire event again to
+                // begin dragging element
+                SVGElement elem = getElementAtPoint(e.getPoint());
+                if (elem != null) {
+                    setSelectedElement(elem);
+                    mousePressed(e);
+                }
+            }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if (manipulator.mouseReleased(e))
+                repaint();
+        }
+
+    }
+
+    /** Handler for all mouse motion events.  Dispatches all events to the manipulators.
+     *
+     * Automatically repaints the view if a manipulator successfully handles
+     * an event.
+     *
+     * Also sets the appropriate mouse cursor when the mouse cursor moves.
+     */
+    private class ViewMouseMotionListener extends MouseMotionAdapter {
+
+        public void mouseDragged(MouseEvent e) {
+            if (manipulator.mouseDragged(e))
+                repaint();
+        }
+
+        public void mouseMoved(MouseEvent me) {
+            setCursor(manipulator.getCursor(me.getPoint()));
+        }
+
+    }
+
+    /** Handler for all key events.  Dispatches all events to the manipulators.
+     *
+     * Automatically repaints the view if a manipulator successfully handles
+     * an event.
+     */
+    public class ViewKeyListener extends KeyAdapter {
+
+        public void keyPressed(KeyEvent e) {
+            if (manipulator.keyPressed(e))
+                repaint();
+        }
+
+        public void keyReleased(KeyEvent e) {
+            if (manipulator.keyReleased(e))
+                repaint();
+        }
+
+        public void keyTyped(KeyEvent e) {
+            if (manipulator.keyTyped(e))
+                repaint();
+        }
+
+    }
+
+    /** Creates a new view */
+    public View() {
+        setFocusable(true);
+
+        selectedElements = new ArrayList<SVGElement>();
+        selectionStyle = new SelectionStyle();
+        defaultStyle = new Style();
+
+        manipulator = new CompositeManipulator(this);
+
+        addMouseListener(new ViewMouseListener());
+        addMouseMotionListener(new ViewMouseMotionListener());
+        addKeyListener(new ViewKeyListener());
+
+        dashedStroke = new BasicStroke(1.0f, // width
+        BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f, // miter limit
+        new float[] { 3.0f, 2.0f, }, // dash array
+        0.0f); // dash phase
+        viewListeners = new ArrayList<ViewListener>();
+    }
+
+    public float getViewportWidth() {
+        return getWidth();
+    }
+
+    public float getViewportHeight() {
+        return getHeight();
+    }
+
+    /** Internal paint entry point.  All drawing in the view uses a {@link Graphics2D},
+     *  so for convenience this method simply delegates to {@link #paint2D}.
+     *
+     *  @param g the {@link Graphics} context to paint to
+     */
+    @Override
+    protected void paintComponent(Graphics g) {
+        paint2D((Graphics2D) g);
+    }
+
+    /** Paints the entire view.
+     *
+     * @param g the {@link Graphics2D} context to paint to
+     */
+    private void paint2D(Graphics2D g) {
+        // Save the context's current stroke
+        Stroke restoreStroke = g.getStroke();
+
+        // Paint view background
+        g.setColor(Color.GRAY);
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        // Paint document background and border
+        int documentWidth = (int) document.getWidth().getValue();
+        int documentHeight = (int) document.getHeight().getValue();
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, documentWidth, documentHeight);
+        g.setColor(Color.BLACK);
+        g.drawRect(-1, -1, documentWidth, documentHeight);
+
+        // Paint document
+        for (SVGElement elem : document) {
+            paintElement(g, elem);
+        }
+
+        // Draw selection
+        for (SVGElement elem : selectedElements) {
+            g.setColor(Color.BLACK);
+            g.setStroke(dashedStroke);
+            g.draw(getElementBounds(elem));
+        }
+
+        // Restore the context's original stroke.
+        g.setStroke(restoreStroke);
+
+        // Draw manipulators
+        manipulator.paint(g);
+    }
+
+    /** Gets a rectangle encompassing the given element.
+     *
+     * Special care is taken to ensure the returned rectangle exactly encompasses
+     * the element's stroke.
+     *
+     * @param elem the element to fit
+     * @return a rectangle encompassing the element.
+     */
+    private Rectangle getElementBounds(SVGElement elem) {
+        if (elem instanceof SVGGroup) {
+            // Get bounding rectangle of all child elements
+            Rectangle bounds = null;
+            for (SVGElement child : ((SVGGroup) elem).getChildren()) {
+                if (bounds == null)
+                    bounds = getElementBounds(child);
+                else
+                    bounds = bounds.union(getElementBounds(child));
+            }
+            return bounds;
+        } else {
+            Shape boundsShape = createStrokedElementShape(elem);
+
+            // Inflate stroked shape by 0.5 to ensure stroked selection border
+            // sits outside of shape
+            boundsShape = new BasicStroke(0.5f).createStrokedShape(boundsShape);
+            return boundsShape.getBounds();
+
+        }
+    }
+
+    /** Creates a new shape representing the stroked region of an element.
+     *
+     * @param elem the element to stroke
+     * @return a {@link Shape} describing the stroke shape
+     */
+    private Shape createStrokedElementShape(SVGElement elem) {
+        Shape shape = elem.createShape();
+
+        float strokeWidth = 0.0f;
+        if (elem instanceof SVGStylable) {
+            SVGStylable style = (SVGStylable) elem;
+            if (style.getStroke().getPaintType() != SVGPaint.SVG_PAINTTYPE_NONE)
+                strokeWidth = style.getStrokeWidth().getValue();
+        }
+
+        // Return stroked shape
+        return new BasicStroke(strokeWidth).createStrokedShape(shape);
+    }
+
+    /** Paints a single element on the graphics context.
+     *
+     * @param g the graphics context to paint to
+     * @param elem the element to paint
+     */
+    public void paintElement(Graphics2D g, SVGElement elem) {
+
+        if (!(elem instanceof SVGStylable))
+            return;
+
+        Shape shape = elem.createShape();
+
+        SVGStylable style = (SVGStylable) elem;
+        SVGPaint fillPaint = style.getFill();
+        SVGPaint strokePaint = style.getStroke();
+        SVGLength strokeWidth = style.getStrokeWidth();
+
+        // Fill the interior of the shape
+        if (fillPaint.getPaintType() == SVGPaint.SVG_PAINTTYPE_RGBCOLOR) {
+            g.setPaint(fillPaint.getRGBColor());
+            g.fill(shape);
+        }
+
+        // Stroke the outline of the shape
+        if (strokePaint.getPaintType() == SVGPaint.SVG_PAINTTYPE_RGBCOLOR) {
+            Stroke stroke = new BasicStroke(strokeWidth.getValue());
+            g.setStroke(stroke);
+            g.setColor(strokePaint.getRGBColor());
+            g.draw(shape);
+        }
+    }
+
+    /** Gets the document currently being displayed by the view. */
+    public SVGDocument getDocument() {
+        return document;
+    }
+
+    /** Sets the document that the view should display.  Clears the current
+     *  selection.
+     *
+     * @param document the document to set
+     */
+    public void setDocument(SVGDocument document) {
+        this.document = document;
+        clearSelection();
+    }
+
+    /** Gets the top-most element at the given point.  This method is useful
+     *  for discovering which element a user has clicked on.  The hit
+     *  test considers the actual element's fill and stroke shape, rather than
+     *  just its bounds.
+     *
+     *  Only top-level elements are returned: group elements are considered to
+     *  have a shape that is the union of all their children.
+     *
+     * @param p the point to test
+     * @return the top-most element at the point, or {@literal null} if there
+     *   are no elements under the point
+     */
+    public SVGElement getElementAtPoint(Point p) {
+        return getElementAtPoint(document.getRootGroup(), p);
+    }
+
+    /** Gets the top-most element at the given point within the given group.
+     *
+     * @param group the group containing the elements to search
+     * @param p the point to test
+     * @return the top-most element at the point, or {@literal null} if there
+     *   are no elements in the group under the point
+     */
+    private SVGElement getElementAtPoint(SVGGroup group, Point p) {
+        // Check children in reverse order; i.e. in reverse order
+        // to the order they are drawn, so the top-most element is
+        // checked first.
+        SVGElement[] elements = group.getChildren();
+        for (int i = elements.length - 1; i >= 0; --i) {
+            SVGElement elem = elements[i];
+            if (elementContainsPoint(elem, p))
+                return elem;
+        }
+        return null;
+    }
+
+    /** Checks if an element will draw over the given point.  Used internally
+     *  by the {@link #getElementAtPoint} methods.
+     *
+     * @param elem the element to test
+     * @param p the point to test
+     * @return {@literal} true if the element draws over the given point
+     */
+    public boolean elementContainsPoint(SVGElement elem, Point p) {
+        if (elem instanceof SVGGroup) {
+            return getElementAtPoint((SVGGroup) elem, p) != null;
+        } else if (elem instanceof SVGStylable) {
+            Shape shape = elem.createShape();
+
+            // Always test interior, even if there's no fill.
+            if (shape.contains(p))
+                return true;
+
+            // Check if stroke was hit
+            shape = createStrokedElementShape(elem);
+            if (shape != null && shape.contains(p))
+                return true;
+        }
+
+        return false;
+    }
+
+    /** Gets a list of all elements that intersect a rectangle.
+     *
+     *  Only top-level elements are returned: group elements are considered to
+     *  have a shape that is the union of all their children.
+     *
+     *  The order of elements in the result is not defined.
+     *
+     * @param rect the rectangle to search
+     * @return an array of elements that intersect or are contained by the
+     *   rectangle.
+     */
+    public SVGElement[] getElementsInRect(Rectangle rect) {
+        ArrayList<SVGElement> elems = new ArrayList<SVGElement>();
+        for (SVGElement elem : document.getRootGroup()) {
+            if (elementIntersectsRect(elem, rect))
+                elems.add(elem);
+        }
+        return elems.toArray(new SVGElement[0]);
+    }
+
+    /** Checks if an element will iintersect with a rectangle.  Used internally
+     *  by {@link #getElementsInRect}.
+     *
+     * @param elem the element to test
+     * @param rect the rectangle to test
+     * @return {@literal} true if the element intersects the rectangle
+     */
+    public boolean elementIntersectsRect(SVGElement elem, Rectangle rect) {
+        if (elem instanceof SVGGroup) {
+            for (SVGElement child : (SVGGroup) elem) {
+                if (elementIntersectsRect(child, rect))
+                    return true;
+            }
+            return false;
+        } else if (elem instanceof SVGStylable) {
+            Shape shape = elem.createShape();
+
+            // Always test interior, even if there's no fill.
+            if (shape.intersects(rect))
+                return true;
+
+            // Check if stroke was hit
+            shape = createStrokedElementShape(elem);
+            if (shape != null && shape.intersects(rect))
+                return true;
+        }
+
+        return false;
+    }
+
+    /** Sets the current selection to a single element.
+     *
+     * @param elem the element to select
+     */
+    public void setSelectedElement(SVGElement elem) {
+        selectedElements.clear();
+        selectedElements.add(elem);
+        setSelectionManipulator();
+        selectionChanged();
+    }
+
+    /** Sets the current selection to an array of elements.
+     *
+     * @param elements the elements to select
+     */
+    public void setSelectedElements(SVGElement[] elements) {
+        selectedElements.clear();
+        for (SVGElement elem : elements)
+            selectedElements.add(elem);
+        setSelectionManipulator();
+        selectionChanged();
+    }
+
+    /** Unselects all elements.
+     */
+    public void clearSelection() {
+        selectedElements.clear();
+        setSelectionManipulator();
+        selectionChanged();
+    }
+
+    /** Gets an array of all currently selected elements. */
+    public SVGElement[] getSelectedElements() {
+        return selectedElements.toArray(new SVGElement[0]);
+    }
+
+    /** Creates a composite manipulator for the current selection.
+     *
+     *  This is called automatically when the selection changes.  The manipulators
+     *  that are set are:
+     *
+     *  <ul>
+     *    <li>{@link SelectManipulator} for changing the current selection</li>
+     *    <li>{@link MoveManipulator} for moving the current selection if there is a selection</li>
+     *    <li>{@link ControlPointManipulator} for resizing the document if there is no selection</li>
+     *    <li>Specialty manipulators for a single-selected element</li>
+     *  </ul>
+     */
+    public void setSelectionManipulator() {
+        // Clear previous manipulators
+        ArrayList<Manipulator> manipulators = manipulator.getManipulators();
+        manipulators.clear();
+
+        // Add select manipulator for modifying the selection
+        if (document != null)
+            manipulators.add(new SelectManipulator(this));
+
+        // Add move manipulator for selected elements
+        if (selectedElements.size() >= 1)
+            manipulators.add(new MoveManipulator(this, getSelectedElements()));
+
+        // Add document resize manipulator
+        if (selectedElements.isEmpty())
+            manipulators.add(new ControlPointManipulator(this, new PointControlPoint(document.getWidth(), document.getHeight())));
+
+        // Add element's manipulators if exactly one element is selected
+        if (selectedElements.size() == 1) {
+            createElementManipulators(manipulators, selectedElements.get(0));
+        }
+
+        repaint();
+        setCursor(manipulator.getCursor(new Point()));
+        fireViewManipulatorChanged();
+    }
+
+    /** Notifies the view that the selection has changed.  Fires the selection
+     *  change event and updates the selection style.
+     */
+    protected void selectionChanged() {
+        selectionStyle.setSelectedElements(selectedElements);
+        fireViewSelectionChanged();
+    }
+
+    /** Fires the {@link ViewListener#viewSelectionChanged} event on all
+     *  view listener */
+    protected void fireViewSelectionChanged() {
+        for (ViewListener listener : viewListeners)
+            listener.viewSelectionChanged(this);
+    }
+
+    /** Fires the {@link ViewListener#viewManipulatorChanged} event on all
+     *  view listener */
+    protected void fireViewManipulatorChanged() {
+        for (ViewListener listener : viewListeners)
+            listener.viewManipulatorChanged(this);
+    }
+
+    /** Sets the current manipulator for the view.
+     *
+     *  This is useful for temporarily changing the behavior of the view.
+     *  For example, when the {@link svgedit.gui.manipulators.InsertRectManipulator} 
+     *  is set on the view, mouse events are interpreted to draw a new rectangle,
+     *  instead of the usual behavior of drawing a selection rectangle.
+     *
+     * @param manipulator the manipulator to set
+     */
+    public void setManipulator(Manipulator manipulator) {
+        // Clear previous manipulators
+        ArrayList<Manipulator> manipulators = this.manipulator.getManipulators();
+        manipulators.clear();
+
+        manipulators.add(manipulator);
+
+        repaint();
+        setCursor(manipulator.getCursor(new Point()));
+        fireViewManipulatorChanged();
+    }
+
+    /** Creates specialist manipulators for the given element.
+     *
+     * When a single element is selected, this method is used to construct the
+     * editing manipulators for that element.  For example, when a rectangle
+     * is selected, 8 {@link RectControlPointManipulators} are created to
+     * provide the 8 resize handles on the element.
+     *
+     * The new manipulators are added to the {@literal manipulators} list.
+     *
+     * @param manipulators list to add manipulators to
+     * @param elem the element to create manipulators for
+     */
+    private void createElementManipulators(ArrayList<Manipulator> manipulators, SVGElement elem) {
+        elem.acceptVisitor(new CreateElementManipulatorsVisitor(manipulators));
+    }
+
+    /** Visitor that implements the {@link createElementManipulators} functionality.
+     *
+     */
+    private class CreateElementManipulatorsVisitor implements SVGVisitor {
+
+        ArrayList<Manipulator> manipulators;
+
+        private void addControlPoint(ControlPoint controlPoint) {
+            manipulators.add(new ControlPointManipulator(View.this, controlPoint));
+        }
+
+        public CreateElementManipulatorsVisitor(ArrayList<Manipulator> manipulators) {
+            this.manipulators = manipulators;
+        }
+
+        public void visitGroup(SVGGroup group) {
+        }
+
+        public void visitRect(SVGRectElement rect) {
+            // Eight-point controls
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.LEFT));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.LEFT | RectControlPoint.TOP));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.RIGHT));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.RIGHT | RectControlPoint.TOP));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.TOP));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.LEFT | RectControlPoint.BOTTOM));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.BOTTOM));
+            addControlPoint(new RectControlPoint(rect, RectControlPoint.RIGHT | RectControlPoint.BOTTOM));
+        }
+
+        public void visitCircle(SVGCircleElement circle) {
+            addControlPoint(new PointControlPoint(circle.getCX(), circle.getCY()));
+            addControlPoint(new CircleRadiusControlPoint(circle));
+        }
+
+        public void visitLine(SVGLineElement line) {
+            addControlPoint(new PointControlPoint(line.getX1(), line.getY1()));
+            addControlPoint(new PointControlPoint(line.getX2(), line.getY2()));
+        }
+    }
+
+    /** Gets the current selection style.  The returned object gives the style
+     *  of the currently selected elements.  If there are multiple elements in
+     *  the selection that do not have the same style attribute, that attribute
+     *  will be null in the returned object.
+     *
+     * @return an object describing the style of the selection
+     */
+    public SVGStylable getSelectionStyle() {
+        return selectionStyle;
+    }
+
+    /** Gets the default style object.  This object is used to style new elements
+     *  added to the document.
+     *
+     * @return an object describing the default style
+     */
+    public SVGStylable getDefaultStyle() {
+        return defaultStyle;
+    }
+
+    /** Sets the fill paint for all selected elements.
+     *
+     * @param paint the fill paint to set
+     */
+    public void setSelectedFill(SVGPaint paint) {
+        for (SVGElement elem : selectedElements) {
+            if (elem instanceof SVGStylable) {
+                ((SVGStylable) elem).getFill().setValueFromPaint(paint);
+                document.setModified(true);
+            }
+        }
+
+        repaint();
+    }
+
+    /** Sets the stroke paint for all selected elements.
+     *
+     * @param paint the stroke paint to set
+     */
+    public void setSelectedStroke(SVGPaint paint) {
+        for (SVGElement elem : selectedElements) {
+            if (elem instanceof SVGStylable) {
+                ((SVGStylable) elem).getStroke().setValueFromPaint(paint);
+                document.setModified(true);
+            }
+        }
+        repaint();
+    }
+
+    /** Sets the stroke width for all selected elements.
+     *
+     * @param strokeWidth the stroke width to set
+     */
+    public void setSelectedStrokeWidth(SVGLength strokeWidth) {
+        for (SVGElement elem : selectedElements) {
+            if (elem instanceof SVGStylable) {
+                ((SVGStylable) elem).getStrokeWidth().setValueFromLength(strokeWidth);
+                document.setModified(true);
+            }
+        }
+        repaint();
+    }
+    
+   
+
+}

@@ -1,0 +1,10 @@
+<html>
+  <head>
+    <title>Package svgedit.svg</title>
+  </head>
+  <body>
+    SVG document object model clases.  These classes roughly conform to the
+    SVG W3C DOM, but have additional functionality specific to <em>svgedit</em>,
+    and reduced functionality due to the subset of SVG that's implemented here.
+  </body>
+</html>
