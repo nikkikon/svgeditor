@@ -12,9 +12,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -28,10 +30,13 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import svgedit.gui.actions.DeleteAction;
 import svgedit.gui.actions.EditDocumentPropertiesAction;
+import svgedit.gui.actions.EnglishAction;
+import svgedit.gui.actions.GemanAction;
 import svgedit.gui.actions.GroupAction;
 import svgedit.gui.actions.InsertCircleElementAction;
 import svgedit.gui.actions.InsertLineElementAction;
 import svgedit.gui.actions.InsertRectElementAction;
+import svgedit.gui.actions.JapaneseAction;
 import svgedit.gui.actions.NewDocumentAction;
 import svgedit.gui.actions.OpenDocumentAction;
 import svgedit.gui.actions.QuitAction;
@@ -79,12 +84,27 @@ public class Frame extends JFrame {
     private Action insertRectAction;
     private Action insertCircleAction;
     private Action insertLineAction;
+    private Action englishAction;
+    private Action gemanAction;
+    private Action japaneseAction;
+    
+    
     private JToggleButton[] toolBarButtons;
 
     private PaintDropDown fillColorPicker;
     private PaintDropDown strokeColorPicker;
     private JTextField strokeWidthTextField;
 
+    private JMenu[] jm = new JMenu[4];
+    private JMenuItem[] jmi = new JMenuItem[16];
+    private JLabel[] jl = new JLabel[3];
+    private String language = "en";
+    private Locale[]   alSupported = {
+            Locale.US,
+            Locale.GERMAN,
+            Locale.JAPAN
+               };
+    
     private class FrameWindowListener extends WindowAdapter {
 
         /** Invokes quit action when user attempts to close window */
@@ -115,7 +135,15 @@ public class Frame extends JFrame {
         insertRectAction = new InsertRectElementAction(this);
         insertCircleAction = new InsertCircleElementAction(this);
         insertLineAction = new InsertLineElementAction(this);
+        
+        
+        englishAction = new EnglishAction(this);
+        gemanAction = new GemanAction(this);
+        japaneseAction = new JapaneseAction(this);
 
+       
+        
+        
         // Associate keyboard shortcuts with actions
 
         newAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -138,27 +166,74 @@ public class Frame extends JFrame {
         add(menuBar, BorderLayout.NORTH);
 
         JMenu fileMenu = new JMenu("File");
-        fileMenu.add(new JMenuItem(newAction));
-        fileMenu.add(new JMenuItem(openAction));
-        fileMenu.add(new JMenuItem(saveAction));
-        fileMenu.add(new JMenuItem(saveAsAction));
-        fileMenu.add(new JMenuItem(documentPropertiesAction));
-        fileMenu.add(new JMenuItem(quitAction));
+        JMenuItem newActionJMenuItem = new JMenuItem(newAction);
+        JMenuItem openActionJMenuItem = new JMenuItem(openAction);
+        JMenuItem saveActionJMenuItem = new JMenuItem(saveAction);
+        JMenuItem saveAsActionJMenuItem = new JMenuItem(saveAsAction);
+        JMenuItem documentPropertiesActionJMenuItem = new JMenuItem(documentPropertiesAction);
+        JMenuItem quitActionJMenuItem = new JMenuItem(quitAction);
+        
+        fileMenu.add(newActionJMenuItem);
+        fileMenu.add(openActionJMenuItem);
+        fileMenu.add(saveActionJMenuItem);
+        fileMenu.add(saveAsActionJMenuItem);
+        fileMenu.add(documentPropertiesActionJMenuItem);
+        fileMenu.add(quitActionJMenuItem);
         menuBar.add(fileMenu);
 
         JMenu editMenu = new JMenu("Edit");
-        editMenu.add(new JMenuItem(selectAllAction));
-        editMenu.add(new JMenuItem(groupAction));
-        editMenu.add(new JMenuItem(ungroupAction));
-        editMenu.add(new JMenuItem(deleteAction));
+        JMenuItem selectAllActionJMenuItem =  new JMenuItem(selectAllAction);
+        JMenuItem groupActionJMenuItem =  new JMenuItem(groupAction);
+        JMenuItem ungroupActionJMenuItem =  new JMenuItem(ungroupAction);
+        JMenuItem deleteActionJMenuItem =  new JMenuItem(deleteAction);
+        
+        editMenu.add(selectAllActionJMenuItem);
+        editMenu.add(groupActionJMenuItem);
+        editMenu.add(ungroupActionJMenuItem);
+        editMenu.add(deleteActionJMenuItem);
         menuBar.add(editMenu);
 
         JMenu insertMenu = new JMenu("Insert");
-        insertMenu.add(new JMenuItem(insertRectAction));
-        insertMenu.add(new JMenuItem(insertCircleAction));
-        insertMenu.add(new JMenuItem(insertLineAction));
+        JMenuItem insertRectActionJMenuItem = new JMenuItem(insertRectAction);
+        JMenuItem insertCircleActionJMenuItem = new JMenuItem(insertCircleAction);
+        JMenuItem insertLineActionJMenuItem = new JMenuItem(insertLineAction);
+        
+        insertMenu.add(insertRectActionJMenuItem);
+        insertMenu.add(insertCircleActionJMenuItem);
+        insertMenu.add(insertLineActionJMenuItem);
         menuBar.add(insertMenu);
-
+        
+        JMenu LanguageMenu = new JMenu("Language");
+        JMenuItem englishActionJMenuItem =new JMenuItem(englishAction);
+        JMenuItem gemanActionJMenuItem =new JMenuItem(gemanAction);
+        JMenuItem japaneseActionJMenuItem =new JMenuItem(japaneseAction);
+        
+        LanguageMenu.add(englishActionJMenuItem);
+        LanguageMenu.add(gemanActionJMenuItem);
+        LanguageMenu.add(japaneseActionJMenuItem);
+        fileMenu.add(LanguageMenu);
+        jmi[0] = newActionJMenuItem;
+        jmi[1] = openActionJMenuItem;
+        jmi[2] = saveActionJMenuItem;
+        jmi[3] = saveAsActionJMenuItem;
+        jmi[4] = documentPropertiesActionJMenuItem;
+        jmi[5] = quitActionJMenuItem;
+        jmi[6] = selectAllActionJMenuItem;
+        jmi[7] = groupActionJMenuItem;
+        jmi[8] = ungroupActionJMenuItem;
+        jmi[9] = deleteActionJMenuItem;
+        jmi[10] = insertRectActionJMenuItem;
+        jmi[11] = insertCircleActionJMenuItem;
+        jmi[12] = insertLineActionJMenuItem;
+        jmi[13] = englishActionJMenuItem;
+        jmi[14] = gemanActionJMenuItem;
+        jmi[15] = japaneseActionJMenuItem;
+        
+        jm[0] = LanguageMenu;
+        jm[1] = fileMenu;
+        jm[2] = editMenu;
+        jm[3] = insertMenu;
+        
         // Create toolbar
 
         fillColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_FILL);
@@ -216,13 +291,20 @@ public class Frame extends JFrame {
         for (JToggleButton button : toolBarButtons)
             toolBar.add(button);
         toolBar.add(new JToolBar.Separator());
-        toolBar.add(new JLabel("Fill:"));
+        JLabel fillLabel = new JLabel("Fill:");
+        JLabel strokeLabel = new JLabel("Stroke:");
+        JLabel strokeWidthLabel = new JLabel("Stroke Width:");
+        toolBar.add(fillLabel);
         toolBar.add(fillColorPicker);
-        toolBar.add(new JLabel("Stroke:"));
+        toolBar.add(strokeLabel);
         toolBar.add(strokeColorPicker);
-        toolBar.add(new JLabel("Stroke Width:"));
+        toolBar.add(strokeWidthLabel);
         toolBar.add(strokeWidthTextField);
-
+        
+        jl[0] = fillLabel;
+        jl[1] = strokeLabel;
+        jl[2] = strokeWidthLabel;
+        
         JPanel viewContainer = new JPanel();
         viewContainer.setLayout(new BorderLayout());
         add(viewContainer);
@@ -417,5 +499,28 @@ public class Frame extends JFrame {
             if (elem instanceof SVGGroup)
                 ungroupAction.setEnabled(true);
         }
+    }
+    
+    public void setLanguage(String la){
+    	this.language = la;
+    }
+    
+    public String getLanguage(){
+    	return this.language;
+    }
+    
+    public JMenu[] getJMenus(){
+    	return jm;
+    }
+    
+    public JMenuItem[] getJMenuItems(){
+    	return jmi;
+    }
+    
+    public JLabel[] getJLabel(){
+    	return jl;
+    }
+    public Locale[] getLocales(){
+    	return alSupported;
     }
 }
