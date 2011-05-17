@@ -34,6 +34,8 @@ public class DocumentPropertiesDialog extends JDialog {
 
     private Action okAction;
     private Action cancelAction;
+    
+    private JComponent jc[] = new JComponent[4];
 
     /** Creates a dialog for editing the properties of a document.
      *
