@@ -7,6 +7,7 @@ import javax.swing.AbstractAction;
 
 import svgedit.gui.Frame;
 
+@SuppressWarnings("serial")
 public class EnglishAction extends AbstractAction{
 	private Frame frame;
 //	private ResourceBundle rb;
@@ -20,7 +21,7 @@ public class EnglishAction extends AbstractAction{
 		frame.restoreAllMenu();
 		
     	frame.rb = ResourceBundle.getBundle( 
-                "en", 
+                "LOCALE_en", 
                 frame.getLocales()[0]);
     	
     	for( int i = 0; i < frame.getJMenus().length; i++ )

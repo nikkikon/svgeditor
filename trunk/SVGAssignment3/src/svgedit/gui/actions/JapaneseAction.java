@@ -10,7 +10,6 @@ import svgedit.gui.Frame;
 @SuppressWarnings("serial")
 public class JapaneseAction extends AbstractAction{
 	private Frame frame;
-	private ResourceBundle rb;
 	
 	public JapaneseAction(Frame frame) {
         super("Japanese");
@@ -20,7 +19,7 @@ public class JapaneseAction extends AbstractAction{
 	public void changeProperties(){
 		frame.restoreAllMenu();
 		frame.rb = ResourceBundle.getBundle( 
-                "jp", 
+                "LOCALE_jp", 
                 frame.getLocales()[2]);
     	
     	for( int i = 0; i < frame.getJMenus().length; i++ )

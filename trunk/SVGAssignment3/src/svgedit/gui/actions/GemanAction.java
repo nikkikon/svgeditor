@@ -1,13 +1,13 @@
 package svgedit.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 
 import svgedit.gui.Frame;
 
+@SuppressWarnings("serial")
 public class GemanAction extends AbstractAction{
 	private Frame frame;
 //	private ResourceBundle rb;
@@ -20,7 +20,7 @@ public class GemanAction extends AbstractAction{
 	public void changeProperties(){
 		frame.restoreAllMenu();
     	frame.rb = ResourceBundle.getBundle( 
-                "ge", 
+                "LOCALE_ge", 
                 frame.getLocales()[1]);
     	for( int i = 0; i < frame.getJMenus().length; i++ )
         {

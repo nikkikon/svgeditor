@@ -1,13 +1,10 @@
 package svgedit.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import javax.swing.AbstractAction;
 
 import svgedit.commandManager.UngroupCommand;
 import svgedit.gui.Frame;
-import svgedit.svg.SVGElement;
-import svgedit.svg.SVGGroup;
 
 /** Finds selected group elements and moves their children into the root
  *  group, deleting the group elements.
