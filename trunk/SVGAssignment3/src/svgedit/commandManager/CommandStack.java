@@ -2,13 +2,20 @@ package svgedit.commandManager;
 
 import java.util.ArrayList;
 
+import svgedit.gui.View;
+
 public class CommandStack{
 	private final ArrayList<CommandInterface> commands = new ArrayList<CommandInterface>();
 	private int currentLocation=-1;
 	private int saveLocation = currentLocation;
+	private View view;
 	
 	public int getSize(){
 		return commands.size();
+	}
+	
+	public CommandStack(View view){
+		this.view=view;
 	}
 	
 	public void addCommand(CommandInterface command){
@@ -17,8 +24,7 @@ public class CommandStack{
 	    //command.execute();
 		commands.add(command);
 		currentLocation++;
-		System.out.println("ADD COMMAND STACK");
-		System.out.println(command);
+		
 	}
 	
 	private void clearInFrontOfCurrent() {
@@ -30,15 +36,21 @@ public class CommandStack{
 	public void undo() {
 		commands.get(currentLocation).undo();
 		currentLocation--;
+		view.getFrame().setUndoEnable();
+		
+        
 	}
 
 	public boolean undoEnabled() {
-		return currentLocation >= 0;
+		return currentLocation >= 1;
 	}
 
 	public void redo() {
+		view.getFrame().setUndoEnable();
 		currentLocation++;
 		commands.get(currentLocation).execute();
+		
+        
 	}
 
 	public boolean redoEnabled() {

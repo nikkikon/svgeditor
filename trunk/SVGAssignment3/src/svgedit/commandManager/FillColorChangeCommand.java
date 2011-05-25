@@ -1,26 +1,14 @@
 package svgedit.commandManager;
 
 import java.awt.Color;
-import java.awt.Paint;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.ArrayList;
-
-import javax.swing.JColorChooser;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import svgedit.gui.Frame;
-import svgedit.gui.PaintDropDown;
 import svgedit.gui.View;
 import svgedit.svg.SVGElement;
-import svgedit.svg.SVGGroup;
 import svgedit.svg.SVGPaint;
 import svgedit.svg.SVGStylable;
 
 public class FillColorChangeCommand implements CommandInterface{
 
-	private Frame frame;
 	private View view;
 	private SVGPaint paint;
 	private ArrayList<SVGElement>elements = new ArrayList<SVGElement>();
@@ -49,6 +37,7 @@ public class FillColorChangeCommand implements CommandInterface{
         }
 
         view.repaint();
+        view.getFrame().setUndoEnable();
     }
 	public void undo(){
 		//int i=0;

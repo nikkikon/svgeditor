@@ -36,6 +36,7 @@ public class GroupCommand implements CommandInterface{
             frame.getView().setSelectedElement(group);
             newGroup = group;
         }	
+        frame.setUndoEnable();
 	}
 	public void undo(){
 

@@ -1,24 +1,15 @@
 package svgedit.commandManager;
 
 import java.awt.Point;
-import svgedit.gui.Frame;
 import svgedit.gui.View;
 import svgedit.gui.controlpoints.ControlPoint;
-import svgedit.svg.SVGElement;
-import svgedit.svg.SVGVisitor;
 
-public class ResizeCommand implements CommandInterface{
-
-	private Frame frame;
+public class ResizeCommand implements CommandInterface{	
 	private View view;
 	//private ArrayList<SVGElement>elements = new ArrayList<SVGElement>();
     private Point iniPoint;
     private Point lastPoint;
-    private SVGVisitor visitor;
-    private ControlPoint controlPoint;
-    private Point newOffset;
-    private SVGElement [] elements;
-    
+    private ControlPoint controlPoint;   
 	public ResizeCommand(View view,Point iniPoint,Point lastPoint,ControlPoint controlPoint){
         this.view=view;
         this.iniPoint=iniPoint;
@@ -32,6 +23,7 @@ public class ResizeCommand implements CommandInterface{
         controlPoint.set(controlPoint.getX()+dx, controlPoint.getY()+dy);
         view.getDocument().setModified(true);
         view.repaint();
+        view.getFrame().setUndoEnable();
      }
 	public void undo(){		
 		float dx = iniPoint.x-lastPoint.x;
@@ -41,4 +33,5 @@ public class ResizeCommand implements CommandInterface{
         view.repaint();
 	}
 }
+	
 	
