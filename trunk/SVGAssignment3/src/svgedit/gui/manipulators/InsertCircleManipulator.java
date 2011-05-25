@@ -4,6 +4,8 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+
+import svgedit.commandManager.InsertCommand;
 import svgedit.gui.View;
 import svgedit.svg.SVGCircleElement;
 import svgedit.svg.SVGDocument;
@@ -15,6 +17,7 @@ import svgedit.svg.SVGLength;
 public class InsertCircleManipulator extends Manipulator {
 
     private SVGCircleElement circle;
+    private InsertCommand insertCommand;
 
     /** Creates a manipulator for drawing a circle within the given view.
      *
@@ -45,10 +48,14 @@ public class InsertCircleManipulator extends Manipulator {
     public boolean mouseReleased(MouseEvent e) {
         View view = getView();
         SVGDocument document = view.getDocument();
-        document.getRootGroup().appendChild(circle);
-        document.setModified(true);
-        view.setSelectedElement(circle);
-        view.setSelectionManipulator();
+        //document.getRootGroup().appendChild(circle);
+        //document.setModified(true);
+       //view.setSelectedElement(circle);
+       // view.setSelectionManipulator();
+        
+        insertCommand = new InsertCommand(view, circle);
+        view.getCommandStack().addCommand(insertCommand);
+        insertCommand.execute();
         circle = null;
         return true;
     }

@@ -14,6 +14,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import svgedit.commandManager.FillColorChangeCommand;
+import svgedit.commandManager.InsertCommand;
 import svgedit.svg.SVGPaint;
 
 /** Drop-down widget for editing a paint property.
@@ -83,16 +86,17 @@ public class PaintDropDown extends JButton {
         });
 
         colorChooser = new JColorChooser();
-        colorChooser.setPreviewPanel(new JPanel());
+        colorChooser.setPreviewPanel(new JPanel());        
         colorChooser.getSelectionModel().addChangeListener(new ChangeListener() {
 
             public void stateChanged(ChangeEvent ce) {
-                paint.setRGBColor(colorChooser.getColor());
-                updateIcon();
-                firePaintChanged();
+            	
+                
+               paint.setRGBColor(colorChooser.getColor());
+               updateIcon();
+               firePaintChanged();
             }
-        });
-
+        });  
         menu = new JPopupMenu();
         menu.add(removeColorButton);
         menu.add(colorChooser);
@@ -107,11 +111,19 @@ public class PaintDropDown extends JButton {
     public SVGPaint getPaint() {
         return paint;
     }
+    
+    public JColorChooser getColorChooser(){
+    	return colorChooser; 
+    }
 
     // Interface for ItemSelectable
     @Override
     public Object[] getSelectedObjects() {
         return new Object[] { paint };
+    }
+    
+    public int getAttribute(){
+    	return attribute;
     }
 
     /** Sets the current paint value displayed by the drop-down.
@@ -129,7 +141,7 @@ public class PaintDropDown extends JButton {
         updateIcon();
     }
 
-    private void updateIcon() {
+    public void updateIcon() {
         setIcon(createIcon(paint, attribute));
     }
 
@@ -141,7 +153,7 @@ public class PaintDropDown extends JButton {
     }
 
     /** Invokes the {@link ItemEvent#ITEM_STATE_CHANGED} event on all listeners */
-    protected void firePaintChanged() {
+    public void firePaintChanged() {
         fireItemStateChanged(new ItemEvent(this, ItemEvent.ITEM_STATE_CHANGED, paint, ItemEvent.SELECTED));
     }
 

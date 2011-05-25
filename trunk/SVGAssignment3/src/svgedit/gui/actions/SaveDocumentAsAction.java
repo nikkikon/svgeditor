@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
@@ -35,6 +36,9 @@ public class SaveDocumentAsAction extends AbstractAction {
     private int pngHeight;
     private int pngWidth;
     private SVGDocument document;
+    private String str;
+    private String saveConfirm="Do you want to replace the existing file?";
+    private String overwriteConfirm="Overwrite existing file?";
 
     /** Create this action for the given frame */
     public SaveDocumentAsAction(Frame frame) {
@@ -56,7 +60,30 @@ public class SaveDocumentAsAction extends AbstractAction {
         file = dialog.getSelectedFile();
         if (file != null) {
             if (file.exists()) {
-                if (JOptionPane.showConfirmDialog(frame.getRootPane(), String.format("Do you want to replace the existing file named %s?", file.getName()), "Overwrite existing file?", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+            	if(frame.getLanguage().equals("ge")){
+            		frame.rb = ResourceBundle.getBundle( 
+                            "ge", 
+                            frame.getLocales()[1]);
+            		restoreSaveConfirm();
+            		str = saveConfirm.trim().replaceAll(" ", "");
+            		saveConfirm=frame.rb.getString(str);
+            		str = overwriteConfirm.trim().replaceAll(" ","");
+            		overwriteConfirm=frame.rb.getString(str);
+            	}
+            	if(frame.getLanguage().equals("en")){
+            		restoreSaveConfirm();
+            	}
+            	if(frame.getLanguage().equals("jp")){
+            		frame.rb = ResourceBundle.getBundle( 
+                            "ge", 
+                            frame.getLocales()[2]);
+            		restoreSaveConfirm();
+            		str = saveConfirm.trim().replaceAll(" ", "");
+            		saveConfirm=frame.rb.getString(str);
+            		str = overwriteConfirm.trim().replaceAll(" ","");
+            		overwriteConfirm=frame.rb.getString(str);
+            	}
+                if (JOptionPane.showConfirmDialog(frame.getRootPane(), saveConfirm, overwriteConfirm, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
                     return;
             }
            /* try {
@@ -128,6 +155,11 @@ public class SaveDocumentAsAction extends AbstractAction {
             g.setColor(strokePaint.getRGBColor());
             ((Graphics2D) g).draw(shape);
         }
+    }
+    
+    private void restoreSaveConfirm(){
+    	saveConfirm="Do you want to replace the existing file?";
+    	overwriteConfirm="Overwrite existing file?";
     }
 
 }

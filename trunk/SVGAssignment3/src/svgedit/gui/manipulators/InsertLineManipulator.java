@@ -5,6 +5,8 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+
+import svgedit.commandManager.InsertCommand;
 import svgedit.gui.View;
 import svgedit.svg.SVGDocument;
 import svgedit.svg.SVGLength;
@@ -17,6 +19,7 @@ import svgedit.svg.SVGPaint;
 public class InsertLineManipulator extends Manipulator {
 
     private SVGLineElement line;
+    private InsertCommand insertCommand;
 
     /** Creates a manipulator for drawing a line within the given view.
      *
@@ -57,10 +60,14 @@ public class InsertLineManipulator extends Manipulator {
     public boolean mouseReleased(MouseEvent e) {
         View view = getView();
         SVGDocument document = view.getDocument();
-        document.getRootGroup().appendChild(line);
-        document.setModified(true);
-        view.setSelectedElement(line);
-        view.setSelectionManipulator();
+        //document.getRootGroup().appendChild(line);
+        //document.setModified(true);
+       // view.setSelectedElement(line);
+        //view.setSelectionManipulator();
+        //
+        insertCommand = new InsertCommand(view, line);
+        view.getCommandStack().addCommand(insertCommand);
+        insertCommand.execute();
         line = null;
         return true;
     }

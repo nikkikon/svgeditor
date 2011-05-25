@@ -17,6 +17,7 @@ public class InsertCircleElementAction extends InsertElementAction {
 
     @Override
     protected Manipulator createManipulator(View view) {
+    	
         return new InsertCircleManipulator(view);
     }
 }

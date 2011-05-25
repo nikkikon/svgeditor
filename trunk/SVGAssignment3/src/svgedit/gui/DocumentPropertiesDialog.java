@@ -8,6 +8,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -37,12 +39,15 @@ public class DocumentPropertiesDialog extends JDialog {
     
     private JComponent jc[] = new JComponent[4];
 
+    private Frame frame;
+    private ResourceBundle rb;
     /** Creates a dialog for editing the properties of a document.
      *
      * @param document the document to edit
      */
-    public DocumentPropertiesDialog(SVGDocument document) {
+    public DocumentPropertiesDialog(SVGDocument document, Frame frame) {
         this.document = document;
+        this.frame = frame;
 
         // Create text fields for modifying the document width and height.
         // Any change to the text fields causes validation, so that the OK
@@ -91,11 +96,13 @@ public class DocumentPropertiesDialog extends JDialog {
         c.anchor = GridBagConstraints.LINE_START;
         c.gridx = 0;
         c.gridy = 0;
-        fieldPanel.add(new JLabel("Width"), c);
-
+        JLabel jl1 =new JLabel("Width");  
+        fieldPanel.add(jl1, c);
+        
+        JLabel jl2 = new JLabel("Height");
         c.gridx = 0;
         c.gridy = 1;
-        fieldPanel.add(new JLabel("Height"), c);
+        fieldPanel.add(jl2, c);
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1.0;
@@ -130,6 +137,22 @@ public class DocumentPropertiesDialog extends JDialog {
         Dimension size = getSize();
         setSize(new Dimension(size.width + 200, size.height));
         setResizable(false);
+        
+        
+        if(frame.getLanguage().equals("ge")){
+        	rb = ResourceBundle.getBundle( 
+                    "ge", 
+                    frame.getLocales()[1]);
+        	String str = okButton.getText().trim().replaceAll(" ", "");
+        	okButton.setText( rb.getString( str) );
+        	str = cancelButton.getText().trim().replaceAll(" ", "");
+        	cancelButton.setText( rb.getString( str) );
+        	str = jl1.getText().trim().replaceAll(" ", "");
+        	jl1.setText( rb.getString( str) );
+        	str = jl2.getText().trim().replaceAll(" ", "");
+        	jl2.setText( rb.getString( str) );
+        	
+        }
     }
 
     /** Checks that the user's input is valid for all fields, and enables or

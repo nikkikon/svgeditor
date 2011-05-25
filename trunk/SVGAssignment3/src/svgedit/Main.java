@@ -10,9 +10,12 @@ public class Main {
      *  a file to load on startup. */
     public static void main(String[] args) throws java.io.IOException {
         Frame frame = new Frame();
+             
         if (args.length > 0)
             frame.openFile(new File(args[0]));
         frame.setVisible(true);
+
+        
     }
 
 };

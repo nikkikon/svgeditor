@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -28,6 +29,11 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+
+import Test.TestUnit;
+
+import svgedit.commandManager.FillColorChangeCommand;
+import svgedit.commandManager.CommandStack;
 import svgedit.gui.actions.DeleteAction;
 import svgedit.gui.actions.EditDocumentPropertiesAction;
 import svgedit.gui.actions.EnglishAction;
@@ -40,9 +46,11 @@ import svgedit.gui.actions.JapaneseAction;
 import svgedit.gui.actions.NewDocumentAction;
 import svgedit.gui.actions.OpenDocumentAction;
 import svgedit.gui.actions.QuitAction;
+import svgedit.gui.actions.RedoAction;
 import svgedit.gui.actions.SaveDocumentAction;
 import svgedit.gui.actions.SaveDocumentAsAction;
 import svgedit.gui.actions.SelectAllAction;
+import svgedit.gui.actions.UndoAction;
 import svgedit.gui.actions.UngroupAction;
 
 import svgedit.svg.SVGLength;
@@ -79,6 +87,8 @@ public class Frame extends JFrame {
     private Action groupAction;
     private Action ungroupAction;
     private Action deleteAction;
+    private Action undoAction;
+    private Action redoAction;
 
     // Actions for adding new elements to the document */
     private Action insertRectAction;
@@ -90,6 +100,7 @@ public class Frame extends JFrame {
     
     
     private JToggleButton[] toolBarButtons;
+    private JToggleButton[] toolBarButtonsReplica;
 
     private PaintDropDown fillColorPicker;
     private PaintDropDown strokeColorPicker;
@@ -98,12 +109,24 @@ public class Frame extends JFrame {
     private JMenu[] jm = new JMenu[4];
     private JMenuItem[] jmi = new JMenuItem[16];
     private JLabel[] jl = new JLabel[3];
+    
+	public ResourceBundle rb;
+	private String saveChangesConfirm="Save changes to current document?";
+	private String saveChangesWindow="Save Changes?";
+	private String unableOpen="Unable to open file";
+	private String unableSave="Unable to save file";
+	private String str;
+
+    
     private String language = "en";
     private Locale[]   alSupported = {
             Locale.US,
             Locale.GERMAN,
             Locale.JAPAN
                };
+   
+    private FillColorChangeCommand colorChangeCommand;
+    
     
     private class FrameWindowListener extends WindowAdapter {
 
@@ -127,6 +150,8 @@ public class Frame extends JFrame {
         documentPropertiesAction = new EditDocumentPropertiesAction(this);
         quitAction = new QuitAction(this);
 
+        undoAction = new UndoAction(this);
+        redoAction = new RedoAction(this);
         selectAllAction = new SelectAllAction(this);
         groupAction = new GroupAction(this);
         ungroupAction = new UngroupAction(this);
@@ -182,15 +207,20 @@ public class Frame extends JFrame {
         menuBar.add(fileMenu);
 
         JMenu editMenu = new JMenu("Edit");
+        JMenuItem undoActionJMenuItem =  new JMenuItem(undoAction);
+        JMenuItem redoActionJMenuItem = new JMenuItem(redoAction);
         JMenuItem selectAllActionJMenuItem =  new JMenuItem(selectAllAction);
         JMenuItem groupActionJMenuItem =  new JMenuItem(groupAction);
         JMenuItem ungroupActionJMenuItem =  new JMenuItem(ungroupAction);
         JMenuItem deleteActionJMenuItem =  new JMenuItem(deleteAction);
-        
+   
+        editMenu.add(undoActionJMenuItem);
+        editMenu.add(redoActionJMenuItem);
         editMenu.add(selectAllActionJMenuItem);
         editMenu.add(groupActionJMenuItem);
         editMenu.add(ungroupActionJMenuItem);
         editMenu.add(deleteActionJMenuItem);
+        
         menuBar.add(editMenu);
 
         JMenu insertMenu = new JMenu("Insert");
@@ -236,14 +266,17 @@ public class Frame extends JFrame {
         
         // Create toolbar
 
-        fillColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_FILL);
+
+       
+        fillColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_FILL);       
         fillColorPicker.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
+            public void itemStateChanged(ItemEvent ie) {               
                 SVGPaint paint = fillColorPicker.getPaint();
                 view.setSelectedFill(paint);
-                view.getDefaultStyle().getFill().setValueFromPaint(paint);
+                view.getDefaultStyle().getFill().setValueFromPaint(paint);               
             }
         });
+        
 
         strokeColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_STROKE);
         strokeColorPicker.addItemListener(new ItemListener() {
@@ -253,17 +286,23 @@ public class Frame extends JFrame {
                 view.getDefaultStyle().getStroke().setValueFromPaint(paint);
             }
         });
+        
 
         strokeWidthTextField = new JTextField();
         strokeWidthTextField.getDocument().addDocumentListener(new DocumentChangedAdapter() {
 
             @Override
-            public void documentChanged() {
+            public void documentChanged(){
                 try {
+                	System.out.println("Document Changed Start");
                     SVGLength length = new SVGLength();
                     length.setValueFromString(strokeWidthTextField.getText());
-                    view.setSelectedStrokeWidth(length);
+                    if(strokeWidthTextField.hasFocus()){
+                    	view.setSelectedStrokeWidth(length);
+                    }
+                    //view.setSelectedStrokeWidth(length);
                     view.getDefaultStyle().getStrokeWidth().setValueFromLength(length);
+                    System.out.println("Document Changed End");
                 } catch (NumberFormatException e) {
                     // Ignore parse error; the user may still be typing
                 }
@@ -284,9 +323,9 @@ public class Frame extends JFrame {
         toolBarButtons = new JToggleButton[] { new JToggleButton(insertRectAction), new JToggleButton(insertCircleAction), new JToggleButton(insertLineAction) };
 
         JToolBar toolBar = new JToolBar();
-        toolBar.add(newAction);
-        toolBar.add(openAction);
-        toolBar.add(saveAction);
+        toolBar.add(newActionJMenuItem);
+        toolBar.add(openActionJMenuItem);
+        toolBar.add(saveActionJMenuItem);
         toolBar.add(new JToolBar.Separator());
         for (JToggleButton button : toolBarButtons)
             toolBar.add(button);
@@ -341,7 +380,10 @@ public class Frame extends JFrame {
         // Size the view to the document
         view.setPreferredSize(new Dimension((int) document.getWidth().getValue() + 20, (int) document.getHeight().getValue() + 20));
         pack();
-
+        
+        toolBarButtonsReplica = new JToggleButton[] { new JToggleButton(insertRectAction), new JToggleButton(insertCircleAction), new JToggleButton(insertLineAction) };
+        
+        
     }
 
     /** Gets the preferences object to use for getting and setting user defaults.
@@ -422,7 +464,25 @@ public class Frame extends JFrame {
             SVGDocument doc = XMLReader.read(file, view);
             setDocument(doc, file);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(getRootPane(), e.getMessage(), "Unable to open file", JOptionPane.ERROR_MESSAGE);
+        	if(getLanguage().equals("ge")){
+        		rb = ResourceBundle.getBundle( 
+                        "ge", 
+                        getLocales()[1]);
+        		restoreAllPopup();
+        		str = unableOpen.trim().replaceAll(" ", "");
+        		unableOpen=rb.getString(str);
+        	}
+        	if(getLanguage().equals("en")){
+        		restoreAllPopup();
+        	}if(getLanguage().equals("jp")){
+        		rb = ResourceBundle.getBundle( 
+                        "jp", 
+                        getLocales()[2]);
+        		restoreAllPopup();
+        		str = unableOpen.trim().replaceAll(" ", "");
+        		unableOpen=rb.getString(str);
+        	}
+            JOptionPane.showMessageDialog(getRootPane(), e.getMessage(), unableOpen, JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -439,7 +499,25 @@ public class Frame extends JFrame {
             setFile(file);
             document.setModified(false);
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(getRootPane(), e.getMessage(), "Unable to save file", JOptionPane.ERROR_MESSAGE);
+        	if(getLanguage().equals("ge")){
+        		rb = ResourceBundle.getBundle( 
+                        "ge", 
+                        getLocales()[1]);
+        		restoreAllPopup();
+        		str = unableSave.trim().replaceAll(" ", "");
+        		unableSave=rb.getString(str);
+        	}
+        	if(getLanguage().equals("en")){
+        		restoreAllPopup();
+        	}if(getLanguage().equals("jp")){
+        		rb = ResourceBundle.getBundle( 
+                        "jp", 
+                        getLocales()[2]);
+        		restoreAllPopup();
+        		str = unableSave.trim().replaceAll(" ", "");
+        		unableSave=rb.getString(str);
+        	}
+            JOptionPane.showMessageDialog(getRootPane(), e.getMessage(), unableSave, JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -451,7 +529,29 @@ public class Frame extends JFrame {
      */
     public boolean confirmSaveChanges() {
         if (document.getModified()) {
-            int result = JOptionPane.showConfirmDialog(null, "Save changes to current document?", "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+        	if(getLanguage().equals("ge")){
+        		rb = ResourceBundle.getBundle( 
+                        "ge", 
+                        getLocales()[1]);
+        		restoreAllPopup();
+        		str = unableSave.trim().replaceAll(" ", "");
+        		saveChangesConfirm=rb.getString(str);
+        		str = unableSave.trim().replaceAll(" ", "");
+        		saveChangesWindow=rb.getString(str);
+        	}
+        	if(getLanguage().equals("en")){
+        		restoreAllPopup();
+        	}if(getLanguage().equals("jp")){
+        		rb = ResourceBundle.getBundle( 
+                        "jp", 
+                        getLocales()[2]);
+        		restoreAllPopup();
+        		str = unableSave.trim().replaceAll(" ", "");
+        		saveChangesConfirm=rb.getString(str);
+        		str = unableSave.trim().replaceAll(" ", "");
+        		saveChangesWindow=rb.getString(str);
+        	}
+            int result = JOptionPane.showConfirmDialog(null, saveChangesConfirm, saveChangesWindow, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 
             if (result == JOptionPane.CANCEL_OPTION)
                 return false;
@@ -501,6 +601,36 @@ public class Frame extends JFrame {
         }
     }
     
+    
+    public void restoreAllMenu(){
+    	jmi[0].setText("New");
+        jmi[1].setText("Open...");
+        jmi[2].setText("Save");
+        jmi[3].setText("Save As...");
+        jmi[4].setText("Document Properties...");
+        jmi[5].setText("Quit");
+        jmi[6].setText("Select All");
+        jmi[7].setText("Group");
+        jmi[8].setText("Ungroup");
+        jmi[9].setText("Delete");
+        jmi[10].setText("Rectangle");
+        jmi[11].setText("Circle");
+        jmi[12].setText("Line");
+        jmi[13].setText("English");
+        jmi[14].setText("German");
+        jmi[15].setText("Japanese");
+        jl[0].setText("Fill");
+        jl[1].setText("Stroke");
+        jl[2].setText("Stroke Width");
+        jm[0].setText("Language");
+        jm[1].setText("File");
+        jm[2].setText("Edit");
+        jm[3].setText("Insert");
+        toolBarButtons[0].setText("Rectangle");
+        toolBarButtons[1].setText("Circle");
+        toolBarButtons[2].setText("Line");
+    }
+    
     public void setLanguage(String la){
     	this.language = la;
     }
@@ -523,4 +653,18 @@ public class Frame extends JFrame {
     public Locale[] getLocales(){
     	return alSupported;
     }
+    
+    public JToggleButton[] getJToggleButton(){
+    	return toolBarButtons;
+    }
+    
+    private void restoreAllPopup(){
+    	saveChangesConfirm="Save changes to current document?";
+    	saveChangesWindow="Save Changes?";
+    	unableOpen="Unable to open file";
+    	unableSave="Unable to save file";
+    }
+    
+
+
 }

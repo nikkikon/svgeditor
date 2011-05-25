@@ -4,6 +4,8 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+
+import svgedit.commandManager.InsertCommand;
 import svgedit.gui.View;
 import svgedit.svg.SVGLength;
 import svgedit.svg.SVGDocument;
@@ -15,6 +17,7 @@ import svgedit.svg.SVGRectElement;
 public class InsertRectManipulator extends Manipulator {
 
     private SVGRectElement rect;
+    private InsertCommand insertCommand;
 
     /** Creates a manipulator for drawing a rectangle within the given view.
      *
@@ -47,10 +50,13 @@ public class InsertRectManipulator extends Manipulator {
     public boolean mouseReleased(MouseEvent e) {
         View view = getView();
         SVGDocument document = view.getDocument();
-        document.getRootGroup().appendChild(rect);
-        document.setModified(true);
-        view.setSelectedElement(rect);
-        view.setSelectionManipulator();
+        //document.getRootGroup().appendChild(rect);
+        //document.setModified(true);
+        //view.setSelectedElement(rect);
+        //view.setSelectionManipulator();
+        insertCommand = new InsertCommand(view, rect);
+        view.getCommandStack().addCommand(insertCommand);
+        insertCommand.execute();
         rect = null;
         return true;
     }
