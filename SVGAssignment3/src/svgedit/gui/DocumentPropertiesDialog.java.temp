@@ -1,0 +1,237 @@
+package svgedit.gui;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import svgedit.svg.SVGDocument;
+import svgedit.svg.SVGLength;
+
+/** Displays a dialog for the user to view and edit the document
+ *  dimensions.
+ *
+ */
+@SuppressWarnings("serial")
+public class DocumentPropertiesDialog extends JDialog {
+
+    private SVGDocument document;
+
+    private JTextField widthTextField;
+    private JTextField heightTextField;
+
+    private Action okAction;
+    private Action cancelAction;
+
+    @SuppressWarnings("unused")
+	private Frame frame;
+    private ResourceBundle rb;
+    private String tmpWidth;
+    private String tmpHeight;
+    /** Creates a dialog for editing the properties of a document.
+     *
+     * @param document the document to edit
+     */
+    public DocumentPropertiesDialog(SVGDocument document, Frame frame) {
+        this.document = document;
+        this.frame = frame;
+
+        // Create text fields for modifying the document width and height.
+        // Any change to the text fields causes validation, so that the OK
+        // button is disabled if invalid input is present in one of the fields.
+        if(frame.getLanguage().equals("ge")){
+       	 NumberFormat nf2 = NumberFormat.getInstance(Locale.GERMAN);
+       	 String str1 = document.getWidth().valueAsString();
+       	 String str2 = document.getHeight().valueAsString();
+       	 if(str1.indexOf("%")!=-1){
+       		 str1 = str1.trim().replaceAll("%", ""); 
+       		 str1 = nf2.format(Float.valueOf(str1));
+       		 str1 +="%"; 
+       	 }else{
+       		 str1 = nf2.format(Float.valueOf(str1));
+       	 }
+       	if(str2.indexOf("%")!=-1){
+      		 str2 = str2.trim().replaceAll("%", ""); 
+      		 str2 = nf2.format(Float.valueOf(str2));
+      		 str2 +="%"; 
+      	 }else{
+      		 str2 = nf2.format(Float.valueOf(str2));
+      	 }
+       	
+       	 widthTextField = new JTextField(str1);
+       	 heightTextField = new JTextField(str2);
+       }
+        else{
+       	widthTextField = new JTextField(document.getWidth().valueAsString());
+       	heightTextField = new JTextField(document.getHeight().valueAsString());
+           	
+       }
+
+        widthTextField.getDocument().addDocumentListener(new DocumentChangedAdapter() {
+            @Override
+            public void documentChanged() {
+                validateFields();
+            }
+        });
+
+        heightTextField.getDocument().addDocumentListener(new DocumentChangedAdapter() {
+            @Override
+            public void documentChanged() {
+                validateFields();
+            }
+        });
+
+        // Create an OK button that applies the changes to the document when
+        // pressed.
+        okAction = new AbstractAction("OK") {
+            public void actionPerformed(ActionEvent ae) {
+                applyChanges();
+                setVisible(false);
+            }
+        };
+
+        // Create a cancel button that simply hides the dialog, returning
+        // thread control to the caller.
+        cancelAction = new AbstractAction("Cancel") {
+
+            public void actionPerformed(ActionEvent ae) {
+                setVisible(false);
+            }
+        };
+
+        // Layout text fields and their labels
+        GridBagConstraints c = new GridBagConstraints();
+        JPanel fieldPanel = new JPanel();
+        fieldPanel.setLayout(new GridBagLayout());
+
+        c.insets = new Insets(4, 8, 4, 8);
+        c.anchor = GridBagConstraints.LINE_START;
+        c.gridx = 0;
+        c.gridy = 0;
+        JLabel jl1 =new JLabel("Width");  
+        fieldPanel.add(jl1, c);
+        
+        JLabel jl2 = new JLabel("Height");
+        c.gridx = 0;
+        c.gridy = 1;
+        fieldPanel.add(jl2, c);
+
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
+        c.gridx = 1;
+        c.gridy = 0;
+        fieldPanel.add(widthTextField, c);
+
+        c.gridx = 1;
+        c.gridy = 1;
+        fieldPanel.add(heightTextField, c);
+
+        add(fieldPanel);
+
+        // OK, Cancel buttons at bottom of dialog
+        JPanel buttonPanel = new JPanel();
+        JButton okButton = new JButton(okAction);
+        JButton cancelButton = new JButton(cancelAction);
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.TRAILING));
+        buttonPanel.add(okButton);
+        buttonPanel.add(cancelButton);
+        add(buttonPanel, BorderLayout.SOUTH);
+
+        // Set default and cancel buttons so that enter and escape keys are
+        // mapped appropriately.
+        getRootPane().setDefaultButton(okButton);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel");
+        getRootPane().getActionMap().put("cancel", cancelAction);
+
+        pack();
+
+        // Increase width for aesthetics, then disable resizing.
+        Dimension size = getSize();
+        setSize(new Dimension(size.width + 200, size.height));
+        setResizable(false);
+        
+        
+        if(frame.getLanguage().equals("ge")){
+        	rb = ResourceBundle.getBundle( 
+                    "LOCALE_ge", 
+                    frame.getLocales()[1]);
+        	String str = okButton.getText().trim().replaceAll(" ", "");
+        	okButton.setText( rb.getString( str) );
+        	str = cancelButton.getText().trim().replaceAll(" ", "");
+        	cancelButton.setText( rb.getString( str) );
+        	str = jl1.getText().trim().replaceAll(" ", "");
+        	jl1.setText( rb.getString( str) );
+        	str = jl2.getText().trim().replaceAll(" ", "");
+        	jl2.setText( rb.getString( str) );
+        	
+        }
+        if(frame.getLanguage().equals("jp")){
+        	rb = ResourceBundle.getBundle( 
+                    "LOCALE_jp", 
+                    frame.getLocales()[1]);
+        	String str = okButton.getText().trim().replaceAll(" ", "");
+        	okButton.setText( rb.getString( str) );
+        	str = cancelButton.getText().trim().replaceAll(" ", "");
+        	cancelButton.setText( rb.getString( str) );
+        	str = jl1.getText().trim().replaceAll(" ", "");
+        	jl1.setText( rb.getString( str) );
+        	str = jl2.getText().trim().replaceAll(" ", "");
+        	jl2.setText( rb.getString( str) );
+        	
+        }
+        if(frame.getLanguage().equals("en")){
+        	okButton.setText("OK");
+        	cancelButton.setText("Cancel");
+        	jl1.setText("Width");
+        	jl2.setText("Height");
+        	
+        }
+    }
+
+    /** Checks that the user's input is valid for all fields, and enables or
+     *  disables the OK button appropriately.
+     */
+    private void validateFields() {
+        boolean validated = true;
+        try {
+            SVGLength length = new SVGLength();
+            tmpWidth = widthTextField.getText();
+            tmpHeight = heightTextField.getText();
+            tmpWidth = tmpWidth.replace(",",".");
+            tmpHeight = tmpHeight.replace(",", ".");
+            length.setValueFromString(tmpWidth);
+            length.setValueFromString(tmpHeight);
+        } catch (NumberFormatException e) {
+            validated = false;
+        }
+
+        okAction.setEnabled(validated);
+    }
+
+    /** Commits changes to the text fields to the document. */
+    private void applyChanges() {
+        tmpWidth = widthTextField.getText();
+        tmpHeight = heightTextField.getText();
+        tmpWidth = tmpWidth.replaceAll(",",".");
+        tmpHeight = tmpHeight.replace(",", ".");
+        document.getWidth().setValueFromString(tmpWidth);
+        document.getHeight().setValueFromString(tmpHeight);
+    }
+
+}
