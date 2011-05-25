@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 
 import svgedit.commandManager.InsertCommand;
 import svgedit.gui.View;
-import svgedit.svg.SVGDocument;
 import svgedit.svg.SVGLength;
 import svgedit.svg.SVGLineElement;
 import svgedit.svg.SVGPaint;
@@ -59,7 +58,6 @@ public class InsertLineManipulator extends Manipulator {
     @Override
     public boolean mouseReleased(MouseEvent e) {
         View view = getView();
-        SVGDocument document = view.getDocument();
         //document.getRootGroup().appendChild(line);
         //document.setModified(true);
        // view.setSelectedElement(line);

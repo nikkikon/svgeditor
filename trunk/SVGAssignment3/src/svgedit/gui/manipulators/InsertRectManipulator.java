@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import svgedit.commandManager.InsertCommand;
 import svgedit.gui.View;
 import svgedit.svg.SVGLength;
-import svgedit.svg.SVGDocument;
 import svgedit.svg.SVGRectElement;
 
 /** Manipulator for drawing a rectangle.  The user clicks and drags within the view
@@ -49,7 +48,6 @@ public class InsertRectManipulator extends Manipulator {
     @Override
     public boolean mouseReleased(MouseEvent e) {
         View view = getView();
-        SVGDocument document = view.getDocument();
         //document.getRootGroup().appendChild(rect);
         //document.setModified(true);
         //view.setSelectedElement(rect);
