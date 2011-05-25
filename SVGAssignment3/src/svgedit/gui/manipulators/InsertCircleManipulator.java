@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import svgedit.commandManager.InsertCommand;
 import svgedit.gui.View;
 import svgedit.svg.SVGCircleElement;
-import svgedit.svg.SVGDocument;
 import svgedit.svg.SVGLength;
 
 /** Manipulator for drawing a circle.  The user clicks and drags within the view
@@ -47,11 +46,7 @@ public class InsertCircleManipulator extends Manipulator {
     @Override
     public boolean mouseReleased(MouseEvent e) {
         View view = getView();
-        SVGDocument document = view.getDocument();
-        //document.getRootGroup().appendChild(circle);
-        //document.setModified(true);
-       //view.setSelectedElement(circle);
-       // view.setSelectionManipulator();
+
         
         insertCommand = new InsertCommand(view, circle);
         view.getCommandStack().addCommand(insertCommand);
