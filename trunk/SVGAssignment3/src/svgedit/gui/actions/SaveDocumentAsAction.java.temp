@@ -1,0 +1,228 @@
+package svgedit.gui.actions;
+
+import gnu.jpdf.PDFJob;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ResourceBundle;
+import java.util.zip.GZIPOutputStream;
+
+import javax.imageio.ImageIO;
+import javax.swing.AbstractAction;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import svgedit.gui.Frame;
+import svgedit.gui.PDFFileFilter;
+import svgedit.gui.PNGFileFilter;
+import svgedit.gui.SVGFileFilter;
+import svgedit.svg.SVGDocument;
+import svgedit.svg.SVGElement;
+import svgedit.svg.SVGLength;
+import svgedit.svg.SVGPaint;
+import svgedit.svg.SVGStylable;
+
+/** Shows a file dialog for the user to select a new file to write the document
+ *  to, then saves it at that location.
+ */
+@SuppressWarnings("serial")
+public class SaveDocumentAsAction extends AbstractAction {
+
+    private Frame frame;
+    private int pngHeight;
+    private int pngWidth;
+    private SVGDocument document;
+    private String str;
+    private int pdfHeight;
+    private int pdfWidth; 
+    private File tmpFile;
+    private String saveConfirm="Do you want to replace the existing file?";
+    private String overwriteConfirm="Overwrite existing file?";
+
+    /** Create this action for the given frame */
+    public SaveDocumentAsAction(Frame frame) {
+        super("Save As...");
+        this.frame = frame;
+       
+    }
+
+    public void actionPerformed(ActionEvent arg0) {
+        File file = frame.getDocument().getFile();
+        JFileChooser dialog;
+        if (file != null)
+            dialog = new JFileChooser(file);
+        else
+            dialog = new JFileChooser(frame.getPreferences().getDefaultPath());
+        dialog.addChoosableFileFilter(new SVGFileFilter());
+        dialog.addChoosableFileFilter(new PNGFileFilter());
+        dialog.addChoosableFileFilter(new PDFFileFilter());
+        dialog.showSaveDialog(null);
+        file = dialog.getSelectedFile();
+        if (file != null) {
+            if (file.exists()) {
+            	if(frame.getLanguage().equals("ge")){
+            		frame.rb = ResourceBundle.getBundle( 
+                            "ge", 
+                            frame.getLocales()[1]);
+            		restoreSaveConfirm();
+            		str = saveConfirm.trim().replaceAll(" ", "");
+            		saveConfirm=frame.rb.getString(str);
+            		str = overwriteConfirm.trim().replaceAll(" ","");
+            		overwriteConfirm=frame.rb.getString(str);
+            	}
+            	if(frame.getLanguage().equals("en")){
+            		restoreSaveConfirm();
+            	}
+            	if(frame.getLanguage().equals("jp")){
+            		frame.rb = ResourceBundle.getBundle( 
+                            "ge", 
+                            frame.getLocales()[2]);
+            		restoreSaveConfirm();
+            		str = saveConfirm.trim().replaceAll(" ", "");
+            		saveConfirm=frame.rb.getString(str);
+            		str = overwriteConfirm.trim().replaceAll(" ","");
+            		overwriteConfirm=frame.rb.getString(str);
+            	}
+                if (JOptionPane.showConfirmDialog(frame.getRootPane(), saveConfirm, overwriteConfirm, JOptionPane.OK_CANCEL_OPTION) == JOptionPane.CANCEL_OPTION)
+                    return;
+            }
+           /* try {
+				//writePNGEncodeToStream();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			*/
+           // frame.getPreferences().setDefaultPath(file.getPath());
+            if(dialog.getFileFilter().getDescription().equals("SVG Files")){
+            	frame.saveFile(file);
+            }
+            else if(dialog.getFileFilter().getDescription().equals("PNG Files")){
+            	try {
+					writePNGEncodeToStream(file);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+            else if(dialog.getFileFilter().getDescription().equals("PDF Files")){
+            	try {
+					writePDFEncodeToStream(file);
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+            else if (dialog.getFileFilter().getDescription().equals("SVGZ Files")){
+            	try {
+					writeSVGZEncodeToStream(file);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        }
+    }
+    
+    
+    public void writePNGEncodeToStream(File file) throws IOException{
+    	document = frame.getDocument();
+    	//pngHeight = (int) frame.getView().getViewportHeight();
+    	//pngWidth = (int) frame.getView().getViewportWidth();
+    	pngHeight = (int) document.getHeight().getValue();
+    	pngWidth = (int) document.getWidth().getValue();
+    	BufferedImage bi = new BufferedImage(pngWidth, pngHeight, BufferedImage.TYPE_INT_ARGB);
+    	Graphics ig = bi.createGraphics();
+    	//Color c = new Color(0,128,0);
+    	ig.setColor(Color.WHITE);
+        ig.fillRect(0, 0, pngWidth, pngHeight);
+        
+        for (SVGElement elem : document) {
+        	paintElement(ig,elem);
+        }
+   // 	ig.drawRect(100, 100, 400, 400);
+    	//ig = frame.getGraphics();
+    	ImageIO.write(bi, "PNG", new File(file.toString()+".png"));
+    }
+    
+    public void writePDFEncodeToStream(File file) throws FileNotFoundException{
+    	document = frame.getDocument();
+    	pdfHeight = (int) document.getHeight().getValue();
+    	pdfWidth = (int) document.getWidth().getValue();
+    	FileOutputStream pdfOutputStream = null;
+    	pdfOutputStream = new FileOutputStream(file.toString()+".pdf");
+    	PDFJob job = new PDFJob(pdfOutputStream);
+    	Graphics pdfG = job.getGraphics();
+    	pdfG.setColor(Color.WHITE);
+    	pdfG.fillRect(0, 0, pdfWidth, pdfHeight);
+    	for (SVGElement elem : document){
+    		paintElement(pdfG,elem);
+    	}
+    	pdfG.dispose();
+    	job.end();
+    }
+    
+    public void writeSVGZEncodeToStream(File file) throws IOException{
+    	//create a tmp file to store the contect to be saved
+    	tmpFile = new File("gzipSave.tmp");
+    	//save the contect in tmp file
+    	frame.saveFile(tmpFile);
+    	//read the tmp file then gzip compress it into the target file
+    	BufferedReader in = new BufferedReader(new FileReader(tmpFile));
+    	BufferedOutputStream out = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(file.toString()+".svgz")));
+    	int c;
+    	while((c=in.read())!=-1){
+    		out.write(c);
+    	}
+    	in.close();
+    	out.close();
+    	//delete tmp file
+    	tmpFile.delete();
+    }
+    
+    public void paintElement(Graphics g,SVGElement elem) {
+
+        if (!(elem instanceof SVGStylable))
+            return;
+
+        Shape shape = elem.createShape();
+
+        SVGStylable style = (SVGStylable) elem;
+        SVGPaint fillPaint = style.getFill();
+        SVGPaint strokePaint = style.getStroke();
+        SVGLength strokeWidth = style.getStrokeWidth();
+
+        // Fill the interior of the shape
+        if (fillPaint.getPaintType() == SVGPaint.SVG_PAINTTYPE_RGBCOLOR) {
+        	((Graphics2D) g).setPaint(fillPaint.getRGBColor());
+            ((Graphics2D) g).fill(shape);
+        	
+        }
+
+        // Stroke the outline of the shape
+        if (strokePaint.getPaintType() == SVGPaint.SVG_PAINTTYPE_RGBCOLOR) {
+            Stroke stroke = new BasicStroke(strokeWidth.getValue());
+            ((Graphics2D) g).setStroke(stroke);
+            g.setColor(strokePaint.getRGBColor());
+            ((Graphics2D) g).draw(shape);
+        }
+    }
+    
+    private void restoreSaveConfirm(){
+    	saveConfirm="Do you want to replace the existing file?";
+    	overwriteConfirm="Overwrite existing file?";
+    }
+
+}
