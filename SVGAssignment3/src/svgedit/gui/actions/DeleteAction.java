@@ -4,9 +4,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 
 import svgedit.commandManager.DeleteCommand;
-import svgedit.commandManager.InsertCommand;
 import svgedit.gui.Frame;
-import svgedit.svg.SVGElement;
 
 /** Deletes all selected elements.
  *

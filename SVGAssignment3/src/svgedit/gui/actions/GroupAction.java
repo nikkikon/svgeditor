@@ -5,9 +5,6 @@ import javax.swing.AbstractAction;
 
 import svgedit.commandManager.GroupCommand;
 import svgedit.gui.Frame;
-import svgedit.svg.SVGElement;
-import svgedit.svg.SVGGroup;
-
 /** Combines selected elements into a group.
  */
 @SuppressWarnings("serial")
