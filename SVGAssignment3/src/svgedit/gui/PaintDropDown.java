@@ -6,6 +6,9 @@ import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -14,9 +17,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
-import svgedit.commandManager.FillColorChangeCommand;
-import svgedit.commandManager.InsertCommand;
 import svgedit.svg.SVGPaint;
 
 /** Drop-down widget for editing a paint property.
@@ -46,6 +46,8 @@ public class PaintDropDown extends JButton {
 
     private int attribute;
     private SVGPaint paint;
+    @SuppressWarnings("unused")
+	private Frame frame;
 
     private JColorChooser colorChooser;
     private JToggleButton removeColorButton;
@@ -56,21 +58,44 @@ public class PaintDropDown extends JButton {
      * @param attribute either {@link #PAINT_ATTRIBUTE_FILL} or {@link #PAINT_ATTRIBUTE_STROKE},
      *   giving the attribute this drop-down is editing.
      */
-    public PaintDropDown(int attribute) {
+    public PaintDropDown(int attribute,Frame frame) {
         this.attribute = attribute;
         this.paint = new SVGPaint();
+        this.frame=frame;
 
         addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
+        public void actionPerformed(ActionEvent ae) {
                 showDropDown();
             }
         });
 
-        String removeColorString;
-        if (attribute == PAINT_ATTRIBUTE_FILL)
-            removeColorString = "No Fill";
-        else
-            removeColorString = "No Stroke";
+        String removeColorString="No Fill";
+        Locale locale =null;
+        if(frame.getLanguage().equals("en")){
+        	locale = frame.getLocales()[0];
+        }
+        else if(frame.getLanguage().equals("ge")){
+        	locale = frame.getLocales()[1];
+        }
+        else if(frame.getLanguage().equals("jp")){
+        	locale = frame.getLocales()[2];
+        }
+      
+        	frame.rb = ResourceBundle.getBundle( 
+                    "LOCALE_"+frame.getLanguage(), 
+                    locale);
+            if (attribute == PAINT_ATTRIBUTE_FILL){
+        	 
+             	
+             	String str1 = "NoFill";
+                removeColorString = frame.rb.getString(str1);
+            }
+            else{
+            	String str2 = "NoStroke";
+                removeColorString = frame.rb.getString(str2);
+            }
+            
+
 
         removeColorButton = new JToggleButton(removeColorString);
         removeColorButton.addActionListener(new ActionListener() {
@@ -102,6 +127,7 @@ public class PaintDropDown extends JButton {
         menu.add(colorChooser);
 
         updateIcon();
+        //frame.setDropDown();
     }
 
     /** Gets the current paint value shown by the drop-down.

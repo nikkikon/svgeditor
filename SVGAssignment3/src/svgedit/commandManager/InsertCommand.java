@@ -23,6 +23,7 @@ public class InsertCommand implements CommandInterface{
         view.setSelectedElement(insertedElement);
         view.setSelectionManipulator();
         insertedElement = null;
+        view.getFrame().setUndoEnable();
 	}
 	
 	public void undo(){

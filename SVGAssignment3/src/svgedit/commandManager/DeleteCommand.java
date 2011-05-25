@@ -31,7 +31,8 @@ public class DeleteCommand implements CommandInterface{
 		}
 	        frame.getDocument().setModified(true);
 	        frame.getView().clearSelection();
-	        frame.repaint();	
+	        frame.repaint();
+	        frame.setUndoEnable();
 	}
 	public void undo(){
 		for(int i =0; i < elements.size(); i++){

@@ -1,25 +1,16 @@
 package svgedit.commandManager;
 
-import java.awt.Color;
-import java.awt.Event;
-import java.awt.Point;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
-import svgedit.gui.Frame;
+import java.awt.Point;
 import svgedit.gui.View;
 import svgedit.svg.SVGCircleElement;
 import svgedit.svg.SVGElement;
 import svgedit.svg.SVGGroup;
 import svgedit.svg.SVGLineElement;
-import svgedit.svg.SVGPaint;
 import svgedit.svg.SVGRectElement;
-import svgedit.svg.SVGStylable;
 import svgedit.svg.SVGVisitor;
 
 public class MoveCommand implements CommandInterface{
-
-	private Frame frame;
 	private View view;
 	//private ArrayList<SVGElement>elements = new ArrayList<SVGElement>();
     private Point initpoint;
@@ -48,6 +39,7 @@ public class MoveCommand implements CommandInterface{
 
         view.getDocument().setModified(true);
         view.repaint();
+        view.getFrame().setUndoEnable();
      }
 	public void undo(){		
 		float dx = (float) (initpoint.getX()-lastpoint.getX());

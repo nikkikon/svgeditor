@@ -9,7 +9,6 @@ import svgedit.svg.SVGGroup;
 public class UngroupCommand implements CommandInterface{
 
 	private Frame frame;
-	
 	private SVGElement [] elems;
 	private ArrayList<SVGElement> oldGroups = new ArrayList<SVGElement>();
 	private ArrayList<SVGElement> oldChildren = new ArrayList<SVGElement>();
@@ -52,6 +51,7 @@ public class UngroupCommand implements CommandInterface{
 
         frame.getView().getDocument().setModified(true);
         frame.getView().setSelectedElements(selection.toArray(new SVGElement[0]));	
+        frame.setUndoEnable();
 	}
 	public void undo(){
 

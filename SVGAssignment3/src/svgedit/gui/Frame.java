@@ -17,7 +17,6 @@ import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -30,10 +29,6 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 
-import Test.TestUnit;
-
-import svgedit.commandManager.FillColorChangeCommand;
-import svgedit.commandManager.CommandStack;
 import svgedit.gui.actions.DeleteAction;
 import svgedit.gui.actions.EditDocumentPropertiesAction;
 import svgedit.gui.actions.EnglishAction;
@@ -97,26 +92,32 @@ public class Frame extends JFrame {
     private Action englishAction;
     private Action gemanAction;
     private Action japaneseAction;
+    private JMenuItem undoActionJMenuItem;
+    private JMenuItem redoActionJMenuItem;
+    public boolean isSvgz;
     
     
     private JToggleButton[] toolBarButtons;
-    private JToggleButton[] toolBarButtonsReplica;
+
 
     private PaintDropDown fillColorPicker;
     private PaintDropDown strokeColorPicker;
     private JTextField strokeWidthTextField;
 
     private JMenu[] jm = new JMenu[4];
-    private JMenuItem[] jmi = new JMenuItem[16];
+    private JMenuItem[] jmi = new JMenuItem[21];
     private JLabel[] jl = new JLabel[3];
-    
-	public ResourceBundle rb;
+   private JToolBar toolBar;
+   private JLabel fillLabel;
+   private JLabel strokeLabel;
+   private JLabel strokeWidthLabel;
+   public ResourceBundle rb;
 	private String saveChangesConfirm="Save changes to current document?";
 	private String saveChangesWindow="Save Changes?";
 	private String unableOpen="Unable to open file";
 	private String unableSave="Unable to save file";
 	private String str;
-
+   
     
     private String language = "en";
     private Locale[]   alSupported = {
@@ -125,7 +126,6 @@ public class Frame extends JFrame {
             Locale.JAPAN
                };
    
-    private FillColorChangeCommand colorChangeCommand;
     
     
     private class FrameWindowListener extends WindowAdapter {
@@ -135,10 +135,11 @@ public class Frame extends JFrame {
         public void windowClosing(WindowEvent we) {
             quitAction.actionPerformed(null);
         }
-    }
+    };
 
     /** Creates a frame with a new, empty document. */
-    public Frame() {
+
+	public Frame() {
         preferences = new Preferences();
 
         // Create all actions presented by the menu bar and toolbar
@@ -179,6 +180,8 @@ public class Frame extends JFrame {
         selectAllAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         groupAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         ungroupAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_G, KeyEvent.SHIFT_MASK | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        undoAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Z,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        redoAction.putValue(AbstractAction.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y,Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         // Hook up handler to window close event to display save confirmation dialog.
 
@@ -207,8 +210,11 @@ public class Frame extends JFrame {
         menuBar.add(fileMenu);
 
         JMenu editMenu = new JMenu("Edit");
-        JMenuItem undoActionJMenuItem =  new JMenuItem(undoAction);
-        JMenuItem redoActionJMenuItem = new JMenuItem(redoAction);
+       undoActionJMenuItem =  new JMenuItem(undoAction);
+       redoActionJMenuItem = new JMenuItem(redoAction);
+        undoActionJMenuItem.setEnabled(false);
+        redoActionJMenuItem.setEnabled(false);
+        
         JMenuItem selectAllActionJMenuItem =  new JMenuItem(selectAllAction);
         JMenuItem groupActionJMenuItem =  new JMenuItem(groupAction);
         JMenuItem ungroupActionJMenuItem =  new JMenuItem(ungroupAction);
@@ -242,6 +248,9 @@ public class Frame extends JFrame {
         LanguageMenu.add(gemanActionJMenuItem);
         LanguageMenu.add(japaneseActionJMenuItem);
         fileMenu.add(LanguageMenu);
+        JMenuItem fileNewActionJMenuItem = new JMenuItem(newAction);
+        JMenuItem fileOpenActionJMenuItem = new JMenuItem(openAction);
+        JMenuItem fileSaveActionJMenuItem = new JMenuItem(saveAction);
         jmi[0] = newActionJMenuItem;
         jmi[1] = openActionJMenuItem;
         jmi[2] = saveActionJMenuItem;
@@ -258,6 +267,11 @@ public class Frame extends JFrame {
         jmi[13] = englishActionJMenuItem;
         jmi[14] = gemanActionJMenuItem;
         jmi[15] = japaneseActionJMenuItem;
+        jmi[16] = fileNewActionJMenuItem;
+        jmi[17] = fileOpenActionJMenuItem;
+        jmi[18] = fileSaveActionJMenuItem;
+        jmi[19] = undoActionJMenuItem;
+        jmi[20] = redoActionJMenuItem;
         
         jm[0] = LanguageMenu;
         jm[1] = fileMenu;
@@ -268,25 +282,7 @@ public class Frame extends JFrame {
 
 
        
-        fillColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_FILL);       
-        fillColorPicker.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {               
-                SVGPaint paint = fillColorPicker.getPaint();
-                view.setSelectedFill(paint);
-                view.getDefaultStyle().getFill().setValueFromPaint(paint);               
-            }
-        });
-        
-
-        strokeColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_STROKE);
-        strokeColorPicker.addItemListener(new ItemListener() {
-            public void itemStateChanged(ItemEvent ie) {
-                SVGPaint paint = strokeColorPicker.getPaint();
-                view.setSelectedStroke(paint);
-                view.getDefaultStyle().getStroke().setValueFromPaint(paint);
-            }
-        });
-        
+                
 
         strokeWidthTextField = new JTextField();
         strokeWidthTextField.getDocument().addDocumentListener(new DocumentChangedAdapter() {
@@ -294,15 +290,17 @@ public class Frame extends JFrame {
             @Override
             public void documentChanged(){
                 try {
-                	System.out.println("Document Changed Start");
                     SVGLength length = new SVGLength();
-                    length.setValueFromString(strokeWidthTextField.getText());
+                    String tmpChangedSWidth = strokeWidthTextField.getText();
+                    tmpChangedSWidth = tmpChangedSWidth.replace(",", ".");
+                    
+                    length.setValueFromString(tmpChangedSWidth);
                     if(strokeWidthTextField.hasFocus()){
+                    	System.out.println("wwwwwwwwwwww");
                     	view.setSelectedStrokeWidth(length);
                     }
                     //view.setSelectedStrokeWidth(length);
                     view.getDefaultStyle().getStrokeWidth().setValueFromLength(length);
-                    System.out.println("Document Changed End");
                 } catch (NumberFormatException e) {
                     // Ignore parse error; the user may still be typing
                 }
@@ -321,22 +319,46 @@ public class Frame extends JFrame {
         });
 
         toolBarButtons = new JToggleButton[] { new JToggleButton(insertRectAction), new JToggleButton(insertCircleAction), new JToggleButton(insertLineAction) };
-
-        JToolBar toolBar = new JToolBar();
-        toolBar.add(newActionJMenuItem);
-        toolBar.add(openActionJMenuItem);
-        toolBar.add(saveActionJMenuItem);
+        toolBar = new JToolBar();
+        toolBar.add(fileNewActionJMenuItem);
+        toolBar.add(fileOpenActionJMenuItem);
+        toolBar.add(fileSaveActionJMenuItem);
         toolBar.add(new JToolBar.Separator());
         for (JToggleButton button : toolBarButtons)
             toolBar.add(button);
         toolBar.add(new JToolBar.Separator());
-        JLabel fillLabel = new JLabel("Fill:");
-        JLabel strokeLabel = new JLabel("Stroke:");
-        JLabel strokeWidthLabel = new JLabel("Stroke Width:");
+        fillLabel = new JLabel("Fill:");
+        strokeLabel = new JLabel("Stroke:");
+        strokeWidthLabel = new JLabel("Stroke Width:");
+        
+        fillColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_FILL,this);       
+        fillColorPicker.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ie) {               
+                SVGPaint paint = fillColorPicker.getPaint();
+                view.setSelectedFill(paint);
+                view.getDefaultStyle().getFill().setValueFromPaint(paint);               
+            }
+        });
+        
+
+        strokeColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_STROKE,this);
+        strokeColorPicker.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent ie) {
+                SVGPaint paint = strokeColorPicker.getPaint();
+                view.setSelectedStroke(paint);
+                view.getDefaultStyle().getStroke().setValueFromPaint(paint);
+            }
+        });
         toolBar.add(fillLabel);
         toolBar.add(fillColorPicker);
         toolBar.add(strokeLabel);
-        toolBar.add(strokeColorPicker);
+        toolBar.add(strokeColorPicker); 
+        
+      
+       
+       
+       
+       
         toolBar.add(strokeWidthLabel);
         toolBar.add(strokeWidthTextField);
         
@@ -352,7 +374,7 @@ public class Frame extends JFrame {
 
         // Create view
 
-        view = new View();
+        view = new View(this);
         view.addViewListener(new ViewListener() {
             public void viewSelectionChanged(View view) {
                 selectionChanged();
@@ -381,9 +403,9 @@ public class Frame extends JFrame {
         view.setPreferredSize(new Dimension((int) document.getWidth().getValue() + 20, (int) document.getHeight().getValue() + 20));
         pack();
         
-        toolBarButtonsReplica = new JToggleButton[] { new JToggleButton(insertRectAction), new JToggleButton(insertCircleAction), new JToggleButton(insertLineAction) };
+      //  toolBarButtonsReplica = new JToggleButton[] { new JToggleButton(insertRectAction), new JToggleButton(insertCircleAction), new JToggleButton(insertLineAction) };
         
-        
+
     }
 
     /** Gets the preferences object to use for getting and setting user defaults.
@@ -531,7 +553,7 @@ public class Frame extends JFrame {
         if (document.getModified()) {
         	if(getLanguage().equals("ge")){
         		rb = ResourceBundle.getBundle( 
-                        "ge", 
+                        "LOCALE_ge", 
                         getLocales()[1]);
         		restoreAllPopup();
         		str = unableSave.trim().replaceAll(" ", "");
@@ -543,7 +565,7 @@ public class Frame extends JFrame {
         		restoreAllPopup();
         	}if(getLanguage().equals("jp")){
         		rb = ResourceBundle.getBundle( 
-                        "jp", 
+                        "LOCALE_jp", 
                         getLocales()[2]);
         		restoreAllPopup();
         		str = unableSave.trim().replaceAll(" ", "");
@@ -583,10 +605,16 @@ public class Frame extends JFrame {
         fillColorPicker.setPaint(style.getFill());
         strokeColorPicker.setPaint(style.getStroke());
         if (style.getStrokeWidth() != null)
-            strokeWidthTextField.setText(style.getStrokeWidth().valueAsString());
-        else
+        {
+        	String tmpSWidth = style.getStrokeWidth().valueAsString(); 
+        	if(getLanguage().equals("ge")){
+        		tmpSWidth = tmpSWidth.replace(".", ",");
+        	}
+            strokeWidthTextField.setText(tmpSWidth);
+        }
+        else{
             strokeWidthTextField.setText("");
-
+        }
         // Enable delete action if elements are selected
         deleteAction.setEnabled(selectedElements.length > 0);
 
@@ -619,6 +647,11 @@ public class Frame extends JFrame {
         jmi[13].setText("English");
         jmi[14].setText("German");
         jmi[15].setText("Japanese");
+        jmi[16].setText("New");
+        jmi[17].setText("Open");
+        jmi[18].setText("Save");
+        jmi[19].setText("undo");
+        jmi[20].setText("redo");
         jl[0].setText("Fill");
         jl[1].setText("Stroke");
         jl[2].setText("Stroke Width");
@@ -665,6 +698,53 @@ public class Frame extends JFrame {
     	unableSave="Unable to save file";
     }
     
+    public void setUndoEnable(){
+    	System.out.println("undo"+getView().getCommandStack().undoEnabled());
+    	System.out.println("redo"+getView().getCommandStack().redoEnabled());
+    	if(getView().getCommandStack().undoEnabled()){
+    		undoActionJMenuItem.setEnabled(true);
+    	}
+    	else{
+    		undoActionJMenuItem.setEnabled(false);
+    	}
+    	if(getView().getCommandStack().redoEnabled()){
+    		redoActionJMenuItem.setEnabled(true);
+    	}
+    	else{
+    		redoActionJMenuItem.setEnabled(false);
+    	}
+    
+    }
+   
+    
+    /*
+    public void setDropDown(){
+    	 fillColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_FILL,this);       
+         fillColorPicker.addItemListener(new ItemListener() {
+             public void itemStateChanged(ItemEvent ie) {               
+                 SVGPaint paint = fillColorPicker.getPaint();
+                 view.setSelectedFill(paint);
+                 view.getDefaultStyle().getFill().setValueFromPaint(paint);               
+             }
+         });
+         
 
+         strokeColorPicker = new PaintDropDown(PaintDropDown.PAINT_ATTRIBUTE_STROKE,this);
+         strokeColorPicker.addItemListener(new ItemListener() {
+             public void itemStateChanged(ItemEvent ie) {
+                 SVGPaint paint = strokeColorPicker.getPaint();
+                 view.setSelectedStroke(paint);
+                 view.getDefaultStyle().getStroke().setValueFromPaint(paint);
+             }
+         });
+         toolBar.add(fillLabel);
+         toolBar.add(fillColorPicker);
+         toolBar.add(strokeLabel);
+         toolBar.add(strokeColorPicker); 
+         toolBar.add(strokeWidthLabel);
+         toolBar.add(strokeWidthTextField);
+    	
+    }
+*/
 
 }
