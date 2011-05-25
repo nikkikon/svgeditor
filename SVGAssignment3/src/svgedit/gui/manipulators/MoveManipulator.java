@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 import svgedit.svg.SVGElement;
+import svgedit.commandManager.MoveCommand;
 import svgedit.gui.View;
 import svgedit.svg.SVGCircleElement;
 import svgedit.svg.SVGGroup;
@@ -18,6 +19,8 @@ public class MoveManipulator extends Manipulator {
 
     private SVGElement[] elements;
     private Point lastPoint;
+    private Point initPoint;
+    private View view;
 
     /** Constructs a manipulator within the given view that can move the given
      *  elements.
@@ -27,14 +30,18 @@ public class MoveManipulator extends Manipulator {
      */
     public MoveManipulator(View view, SVGElement[] elements) {
         super(view);
+        this.view = view;
         this.elements = elements;
+        
     }
 
     @Override
     public boolean mousePressed(MouseEvent e) {
-        for (SVGElement element : elements) {
+        
+    	for (SVGElement element : elements) {
             if (getView().elementContainsPoint(element, e.getPoint())) {
                 lastPoint = e.getPoint();
+                initPoint = e.getPoint();
                 return true;
             }
         }
@@ -43,6 +50,7 @@ public class MoveManipulator extends Manipulator {
 
     @Override
     public boolean mouseDragged(MouseEvent e) {
+    	
         float dx = (float) (e.getX() - lastPoint.getX());
         float dy = (float) (e.getY() - lastPoint.getY());
 
@@ -53,12 +61,18 @@ public class MoveManipulator extends Manipulator {
 
         getView().getDocument().setModified(true);
         lastPoint = e.getPoint();
+        
         return true;
     }
 
     @Override
+  
+    
     public boolean mouseReleased(MouseEvent e) {
-        return true;
+    	MoveCommand mc= new MoveCommand(view, initPoint,lastPoint, elements); 
+    	view.getCommandStack().addCommand(mc);
+    	System.out.println("ADD MOVE COMMAND");
+    	return true;
     }
 
     /** Visitor implementing the move logic for each element type. */

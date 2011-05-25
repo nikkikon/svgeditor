@@ -9,14 +9,18 @@ import svgedit.gui.manipulators.Manipulator;
  *
  */
 @SuppressWarnings("serial")
-public class InsertLineElementAction extends InsertElementAction {
-
-    public InsertLineElementAction(Frame frame) {
+public class InsertLineElementAction extends InsertElementAction{
+  
+    
+    public InsertLineElementAction(Frame frame) {   	
         super("Line", frame);
+      
     }
 
     @Override
     protected Manipulator createManipulator(View view) {
+    	
         return new InsertLineManipulator(view);
     }
+
 }

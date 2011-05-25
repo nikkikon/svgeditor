@@ -3,6 +3,8 @@ package svgedit.gui.actions;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import javax.swing.AbstractAction;
+
+import svgedit.commandManager.UngroupCommand;
 import svgedit.gui.Frame;
 import svgedit.svg.SVGElement;
 import svgedit.svg.SVGGroup;
@@ -22,6 +24,11 @@ public class UngroupAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent ae) {
+    	UngroupCommand uc = new UngroupCommand(frame);
+    	frame.getView().getCommandStack().addCommand(uc);
+    	uc.execute();
+    	
+    	/*
         SVGElement elems[] = frame.getView().getSelectedElements();
 
         // New selection will be previous selection, plus all children
@@ -50,5 +57,6 @@ public class UngroupAction extends AbstractAction {
 
         frame.getView().getDocument().setModified(true);
         frame.getView().setSelectedElements(selection.toArray(new SVGElement[0]));
+        */
     }
 }

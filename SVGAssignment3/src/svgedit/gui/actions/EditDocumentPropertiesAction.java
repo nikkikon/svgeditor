@@ -19,7 +19,7 @@ public class EditDocumentPropertiesAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent ae) {
-        DocumentPropertiesDialog dlg = new DocumentPropertiesDialog(frame.getDocument());
+        DocumentPropertiesDialog dlg = new DocumentPropertiesDialog(frame.getDocument(),frame);
         dlg.setModal(true);
         dlg.setLocationRelativeTo(frame);
         dlg.setVisible(true);

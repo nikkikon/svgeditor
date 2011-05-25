@@ -15,6 +15,11 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import javax.swing.JComponent;
+
+import svgedit.commandManager.FillColorChangeCommand;
+import svgedit.commandManager.CommandStack;
+import svgedit.commandManager.StrokeColorChangeCommand;
+import svgedit.commandManager.StrokeWidthChangeCommand;
 import svgedit.gui.controlpoints.CircleRadiusControlPoint;
 
 import svgedit.svg.SVGDocument;
@@ -56,6 +61,11 @@ public class View extends JComponent implements SVGViewport {
 
     /** Default style for new elements */
     private Style defaultStyle;
+    
+	private CommandStack cStack;
+	private FillColorChangeCommand fillColorChangeCommand;
+	private StrokeColorChangeCommand strokeColorChangeCommand;
+    private StrokeWidthChangeCommand strokeWidthChangeCommand;
 
     private ArrayList<ViewListener> viewListeners;
 
@@ -176,6 +186,7 @@ public class View extends JComponent implements SVGViewport {
         new float[] { 3.0f, 2.0f, }, // dash array
         0.0f); // dash phase
         viewListeners = new ArrayList<ViewListener>();
+        cStack = new CommandStack();
     }
 
     public float getViewportWidth() {
@@ -643,6 +654,10 @@ public class View extends JComponent implements SVGViewport {
      * @param paint the fill paint to set
      */
     public void setSelectedFill(SVGPaint paint) {
+    	fillColorChangeCommand = new FillColorChangeCommand(this,paint);
+    	cStack.addCommand(fillColorChangeCommand);
+    	fillColorChangeCommand.execute();
+    	/*
         for (SVGElement elem : selectedElements) {
             if (elem instanceof SVGStylable) {
                 ((SVGStylable) elem).getFill().setValueFromPaint(paint);
@@ -651,6 +666,7 @@ public class View extends JComponent implements SVGViewport {
         }
 
         repaint();
+        */
     }
 
     /** Sets the stroke paint for all selected elements.
@@ -658,13 +674,9 @@ public class View extends JComponent implements SVGViewport {
      * @param paint the stroke paint to set
      */
     public void setSelectedStroke(SVGPaint paint) {
-        for (SVGElement elem : selectedElements) {
-            if (elem instanceof SVGStylable) {
-                ((SVGStylable) elem).getStroke().setValueFromPaint(paint);
-                document.setModified(true);
-            }
-        }
-        repaint();
+    	strokeColorChangeCommand = new StrokeColorChangeCommand(this,paint);
+        cStack.addCommand(strokeColorChangeCommand);
+        strokeColorChangeCommand.execute();
     }
 
     /** Sets the stroke width for all selected elements.
@@ -672,6 +684,10 @@ public class View extends JComponent implements SVGViewport {
      * @param strokeWidth the stroke width to set
      */
     public void setSelectedStrokeWidth(SVGLength strokeWidth) {
+    	strokeWidthChangeCommand = new StrokeWidthChangeCommand(this,strokeWidth);
+    	cStack.addCommand(strokeWidthChangeCommand);
+    	strokeColorChangeCommand.execute();
+    	/*
         for (SVGElement elem : selectedElements) {
             if (elem instanceof SVGStylable) {
                 ((SVGStylable) elem).getStrokeWidth().setValueFromLength(strokeWidth);
@@ -679,6 +695,11 @@ public class View extends JComponent implements SVGViewport {
             }
         }
         repaint();
+        */
+    }
+    
+    public CommandStack getCommandStack(){
+    	return cStack;
     }
     
    

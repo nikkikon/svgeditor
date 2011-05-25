@@ -2,6 +2,8 @@ package svgedit.gui.actions;
 
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
+
+import svgedit.commandManager.GroupCommand;
 import svgedit.gui.Frame;
 import svgedit.svg.SVGElement;
 import svgedit.svg.SVGGroup;
@@ -20,6 +22,11 @@ public class GroupAction extends AbstractAction {
     }
 
     public void actionPerformed(ActionEvent ae) {
+    	GroupCommand gc = new GroupCommand(frame);
+    	frame.getView().getCommandStack().addCommand(gc);
+    	gc.execute();
+    	/*
+    	
         SVGElement elems[] = frame.getView().getSelectedElements();
 
         // Remove elems from their current parent and add to a new
@@ -36,6 +43,7 @@ public class GroupAction extends AbstractAction {
             frame.getView().getDocument().setModified(true);
             frame.getView().setSelectedElement(group);
         }
+        */
     }
 
 

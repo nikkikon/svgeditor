@@ -39,6 +39,7 @@ public class SVGGroup extends SVGElement implements Iterable<SVGElement> {
     public void appendChild(SVGElement child) {
         assert child.getParent() == null;
         children.add(child);
+        System.out.println("11111"+child);
         child.setParent(this);
     }
 
